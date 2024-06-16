@@ -1,24 +1,7 @@
 ---
-import PortfolioHeaders from "../components/headers/PortfolioHeaders"
+import PortfolioLayout from "../layouts/PortfolioLayout.astro";
 ---
 
-<html>
-  <head>
-	<PortfolioHeaders />
-    <title>My page</title>
-    <script src="https://unpkg.com/htmx.org@1.9.6"
-      integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"
-      crossorigin="anonymous"></script>
-  </head>
-</html>
-<section>
-  <div id="parent-div">Target here</div>
-
-  <button hx-post="/partials/clicked/"
-    hx-trigger="click"
-    hx-target="#parent-div"
-    hx-swap="innerHTML"
-  >
-      Click Me!
-  </button>
-</section>
+<PortfolioLayout>
+  <p>My page</p>
+</PortfolioLayout>
