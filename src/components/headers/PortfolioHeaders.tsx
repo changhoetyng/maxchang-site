@@ -1,7 +1,9 @@
 export default function PortfolioHeaders() {
   return (
-    <div className="flex justify-around pt-4 pb-4 bg-main-color text-center cursor-pointer sticky top-0">
-      <h1 className="font-medium text-xl text-white">Max Chang</h1>
+    <div className="flex justify-around pt-4 pb-4 text-center sticky top-0">
+      <h1 className="font-medium text-xl text-white cursor-pointer">
+        Max Chang
+      </h1>
       <div className="flex flex-row">
         <a
           href="#about"
