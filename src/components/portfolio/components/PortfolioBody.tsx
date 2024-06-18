@@ -1,6 +1,9 @@
-import { animated, useSpring, useSprings } from "@react-spring/web";
+import { animated, useSpring } from "@react-spring/web";
 
-export default function Portfolio(props: { children: React.ReactNode }) {
+export default function PortfolioBody(
+  props: Readonly<{ children: React.ReactNode }>
+) {
+  const HEADER_HEIGHT = 64;
   const gradients = {
     gradient1: `
           radial-gradient(at 59% 84%, hsla(265, 28%, 19%, 1) 0px, transparent 50%),
@@ -14,7 +17,7 @@ export default function Portfolio(props: { children: React.ReactNode }) {
         `,
   };
 
-  const [{ background }, api] = useSpring(() => ({
+  const [{ background }] = useSpring(() => ({
     from: { background: gradients.gradient1 },
     to: { background: gradients.gradient2 },
     config: { duration: 3000 },
@@ -22,7 +25,11 @@ export default function Portfolio(props: { children: React.ReactNode }) {
   }));
   return (
     <animated.div
-      style={{ minHeight: "100vh", maxHeight: "100vh", background: background }}
+      style={{
+        minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
+        maxHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
+        background: background,
+      }}
     >
       {props.children}
     </animated.div>

@@ -1,7 +1,13 @@
 ---
-import PortfolioLayout from "../layouts/PortfolioLayout.astro";
+import PortfolioHeaders from "../components/headers/PortfolioHeaders";
+import Portfolio from "../components/portfolio/Portfolio";
 ---
 
-<PortfolioLayout>
-  <h1>Portfolio</h1>
-</PortfolioLayout>
+<html class="bg-main-color">
+  <head>
+    <PortfolioHeaders />
+  </head>
+  <body>
+    <Portfolio client:load />
+  </body>
+</html>
