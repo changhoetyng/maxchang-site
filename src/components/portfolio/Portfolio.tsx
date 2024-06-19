@@ -4,6 +4,7 @@ import { Parallax, ParallaxLayer } from "@react-spring/parallax";
 
 export default function Portfolio() {
   const HEADER_HEIGHT = 64;
+  console.log("Portfolio");
   return (
     <div>
       <PortfolioBody>
