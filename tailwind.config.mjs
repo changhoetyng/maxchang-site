@@ -11,6 +11,7 @@ export default {
     },
     fontFamily: {
       sans: ["Helvetica", "Arial", "sans-serif"],
+      "andale-mono": ["Andale Mono", "monospace"],
     },
   },
   plugins: [],

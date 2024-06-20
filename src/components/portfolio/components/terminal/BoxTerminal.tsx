@@ -1,8 +1,8 @@
 export default function BoxTerminal({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <div className="flex flex-col w-full h-full bg-black rounded-lg shadow-lg">
       <div className="flex items-center justify-between px-4 py-2 bg-gray-900 rounded-t-lg">

@@ -3,6 +3,7 @@ import LandingPage from "./components/LandingPage";
 import { Parallax, ParallaxLayer } from "@react-spring/parallax";
 import Introduction from "./components/Introduction";
 import BoxTerminal from "./components/terminal/BoxTerminal";
+import TextTerminal from "./components/terminal/TextTerminal";
 
 export default function Portfolio() {
   const HEADER_HEIGHT = 64;
@@ -37,9 +38,11 @@ export default function Portfolio() {
               speed={0.5}
               style={{ ...alignCenter, justifyContent: "flex-end" }}
             >
-              <div className="w-4/6 h-48 mr-3">
+              <div className="w-3/6 h-48 mr-14 max-w-5xl">
                 <BoxTerminal>
-                  <h1 className="text-green-600">Hello</h1>
+                  <TextTerminal>
+                    Welcome to My Portfolio! - I’m a Software Engineer
+                  </TextTerminal>
                 </BoxTerminal>
               </div>
             </ParallaxLayer>
