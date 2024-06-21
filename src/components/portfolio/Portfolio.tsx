@@ -1,9 +1,7 @@
 import PortfolioBody from "./components/PortfolioBody";
-import LandingPage from "./components/LandingPage";
 import { Parallax, ParallaxLayer } from "@react-spring/parallax";
 import Introduction from "./components/Introduction";
-import BoxTerminal from "./components/terminal/BoxTerminal";
-import TextTerminal from "./components/terminal/TextTerminal";
+import MainTerminal from "./components/MainTerminal";
 
 export default function Portfolio() {
   const HEADER_HEIGHT = 64;
@@ -29,48 +27,60 @@ export default function Portfolio() {
             <ParallaxLayer
               offset={0}
               speed={0.2}
-              style={{ ...alignCenter, justifyContent: "flex-start" }}
+              style={{
+                ...alignCenter,
+                justifyContent: "flex-start",
+              }}
             >
               <Introduction />
             </ParallaxLayer>
             <ParallaxLayer
               offset={0}
               speed={0.5}
-              style={{ ...alignCenter, justifyContent: "flex-end" }}
+              style={{
+                ...alignCenter,
+                justifyContent: "flex-end",
+              }}
             >
-              <div className="w-3/6 h-48 mr-14 max-w-5xl">
-                <BoxTerminal>
-                  <TextTerminal>
-                    Welcome to My Portfolio! - I’m a Software Engineer
-                  </TextTerminal>
-                </BoxTerminal>
-              </div>
+              <MainTerminal isTerminalActive={true} />
             </ParallaxLayer>
             <ParallaxLayer
               offset={1}
               speed={0.4}
-              style={{ ...alignCenter, justifyContent: "flex-start" }}
+              style={{
+                ...alignCenter,
+                justifyContent: "flex-start",
+              }}
             >
               <Introduction />
             </ParallaxLayer>
             <ParallaxLayer
               offset={1}
               speed={1}
-              style={{ ...alignCenter, justifyContent: "flex-end" }}
+              style={{
+                ...alignCenter,
+                justifyContent: "flex-end",
+              }}
             >
               <Introduction />
             </ParallaxLayer>
             <ParallaxLayer
               offset={2}
               speed={0.5}
-              style={{ ...alignCenter, justifyContent: "flex-start" }}
+              style={{
+                ...alignCenter,
+                justifyContent: "flex-start",
+              }}
             >
               <Introduction />
             </ParallaxLayer>
             <ParallaxLayer
               offset={2}
               speed={1}
-              style={{ ...alignCenter, justifyContent: "flex-end" }}
+              style={{
+                ...alignCenter,
+                justifyContent: "flex-end",
+              }}
             >
               <Introduction />
             </ParallaxLayer>
