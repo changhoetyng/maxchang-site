@@ -1,0 +1,80 @@
+import type { TerminalSelectData } from "@/types/Terminal";
+import clsx from "clsx";
+import { useEffect, useState } from "react";
+
+enum ContentTypes {
+  TEXT = "TEXT",
+  SELECT = "SELECT",
+}
+
+export default function SelectTerminal({
+  data,
+  isActive,
+}: Readonly<{
+  data: TerminalSelectData[];
+  isActive: boolean;
+}>) {
+  const [activeSelection, setActiveSelection] = useState(0);
+
+  const [activeContentType, setActiveContentType] = useState<ContentTypes>(
+    ContentTypes.SELECT
+  );
+  // Handle Actions
+  function arrowUp() {
+    // Select the next item in the select terminal
+    if (activeContentType === ContentTypes.SELECT) {
+      setActiveSelection((prevSelection) =>
+        prevSelection === 0 ? prevSelection : prevSelection - 1
+      );
+    }
+  }
+
+  function arrowDown() {
+    // Select the previous item in the select terminal
+    if (activeContentType === ContentTypes.SELECT) {
+      setActiveSelection((prevSelection) =>
+        prevSelection === data.length - 1 ? prevSelection : prevSelection + 1
+      );
+    }
+  }
+
+  useEffect(() => {
+    function handleKeypress(e: KeyboardEvent) {
+      e.preventDefault();
+      if (e.key === "ArrowUp") {
+        console.log(e.key);
+        arrowUp();
+      } else if (e.key === "ArrowDown") {
+        console.log(e.key);
+        arrowDown();
+      }
+    }
+
+    if (isActive) {
+      window.addEventListener("keydown", handleKeypress);
+    } else {
+      window.removeEventListener("keydown", handleKeypress);
+    }
+
+    // Cleanup the event listener on component unmount or when isTerminalActive changes
+    return () => {
+      window.removeEventListener("keydown", handleKeypress);
+    };
+  }, [isActive]);
+
+  return (
+    <div className="flex flex-col">
+      {data.map((item, idx) => (
+        <span
+          key={item.value}
+          className={clsx(
+            idx == activeSelection ? "text-pink-500" : "text-green-500"
+          )}
+        >
+          {idx == activeSelection ? "> " : "  "}
+          {item.label}
+        </span>
+      ))}
+    </div>
+  );
+}

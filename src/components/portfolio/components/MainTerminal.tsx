@@ -1,26 +1,56 @@
 import BoxTerminal from "./terminal/BoxTerminal";
+import SelectTerminal from "./terminal/SelectTerminal";
 import TextTerminal from "./terminal/TextTerminal";
 import { useEffect, useState } from "react";
+
+enum ContentTypes {
+  TEXT = "TEXT",
+  SELECT = "SELECT",
+}
 
 export default function MainTerminal({
   isTerminalActive,
 }: Readonly<{ isTerminalActive: boolean }>) {
+  // Terminal contents is the content that the user has typed
   const [terminalContents, setTerminalContents] = useState([
     "Welcome to My Portfolio! - I’m a Software Engineer",
   ]);
+  const [contentTypes, setContentTypes] = useState<ContentTypes[]>([
+    ContentTypes.TEXT,
+  ]);
 
+  // Active content is the content that the user is currently typing
   const [activeContent, setActiveContent] = useState("");
+  const [activeContentType, setActiveContentType] = useState<ContentTypes>(
+    ContentTypes.SELECT
+  );
+
+  // active selection for the select terminal
+
+  const items = [
+    {
+      label: "First",
+      value: "first",
+    },
+    {
+      label: "Second",
+      value: "second",
+    },
+    {
+      label: "Third",
+      value: "third",
+    },
+  ];
 
   useEffect(() => {
     function handleKeypress(e: KeyboardEvent) {
+      e.preventDefault();
       if (e.key === "Enter") {
         addTerminalContent(activeContent);
         setActiveContent("");
       } else if (e.key === "Backspace") {
-        e.preventDefault(); // Prevent default action to avoid browser navigation
         setActiveContent((prevContent) => prevContent.slice(0, -1));
       } else if (e.key.length === 1) {
-        e.preventDefault();
         setActiveContent((prevContent) => prevContent + e.key);
       }
     }
@@ -51,6 +81,7 @@ export default function MainTerminal({
         <TextTerminal isActive={true}>
           maxchang ~ % {activeContent}
         </TextTerminal>
+        <SelectTerminal data={items} isActive={true} />
       </BoxTerminal>
     </div>
   );

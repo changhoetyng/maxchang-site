@@ -20,7 +20,7 @@ export default function TextTerminal({
   }, []);
 
   return (
-    <div className="flex flex-row items-center font-andale-mono whitespace-pre-wrap">
+    <div className="flex flex-row items-center">
       <h1 className="text-green-500">
         {children}
         {isBlinking && isActive ? (
