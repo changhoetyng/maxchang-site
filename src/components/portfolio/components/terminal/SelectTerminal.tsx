@@ -1,4 +1,4 @@
-import type { TerminalSelectData } from "@/types/Terminal";
+import type { TerminalSelectData } from "@/types/terminal";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 
@@ -16,26 +16,19 @@ export default function SelectTerminal({
 }>) {
   const [activeSelection, setActiveSelection] = useState(0);
 
-  const [activeContentType, setActiveContentType] = useState<ContentTypes>(
-    ContentTypes.SELECT
-  );
   // Handle Actions
   function arrowUp() {
     // Select the next item in the select terminal
-    if (activeContentType === ContentTypes.SELECT) {
-      setActiveSelection((prevSelection) =>
-        prevSelection === 0 ? prevSelection : prevSelection - 1
-      );
-    }
+    setActiveSelection((prevSelection) =>
+      prevSelection === 0 ? prevSelection : prevSelection - 1
+    );
   }
 
   function arrowDown() {
     // Select the previous item in the select terminal
-    if (activeContentType === ContentTypes.SELECT) {
-      setActiveSelection((prevSelection) =>
-        prevSelection === data.length - 1 ? prevSelection : prevSelection + 1
-      );
-    }
+    setActiveSelection((prevSelection) =>
+      prevSelection === data.length - 1 ? prevSelection : prevSelection + 1
+    );
   }
 
   useEffect(() => {

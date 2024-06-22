@@ -1,5 +1,6 @@
 import BoxTerminal from "./terminal/BoxTerminal";
 import SelectTerminal from "./terminal/SelectTerminal";
+import TableTerminal from "./terminal/TableTerminal";
 import TextTerminal from "./terminal/TextTerminal";
 import { useEffect, useState } from "react";
 
@@ -42,6 +43,17 @@ export default function MainTerminal({
     },
   ];
 
+  const data = {
+    header: ["Name", "Age", "Occupation"],
+    rows: [
+      [
+        "Alice",
+        24,
+        ["link", "Engineer", "https://github.com/changhoetyng/noggingblog-api"],
+      ],
+    ],
+  };
+
   useEffect(() => {
     function handleKeypress(e: KeyboardEvent) {
       e.preventDefault();
@@ -78,10 +90,11 @@ export default function MainTerminal({
             {content}
           </TextTerminal>
         ))}
-        <TextTerminal isActive={true}>
+        <TextTerminal isActive={true} onEnter={addTerminalContent}>
           maxchang ~ % {activeContent}
         </TextTerminal>
         <SelectTerminal data={items} isActive={true} />
+        <TableTerminal data={data} isActive={true} />
       </BoxTerminal>
     </div>
   );
