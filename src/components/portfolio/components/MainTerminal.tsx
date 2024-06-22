@@ -2,12 +2,19 @@ import BoxTerminal from "./terminal/BoxTerminal";
 import SelectTerminal from "./terminal/SelectTerminal";
 import TableTerminal from "./terminal/TableTerminal";
 import TextTerminal from "./terminal/TextTerminal";
+import { processTerminalCommand } from "@/components/portfolio/utils/TerminalProcessor";
 import { useEffect, useState, useRef } from "react";
+import {
+  isTerminalSelectData,
+  type TerminalSelectData,
+} from "@/types/terminal";
 
 enum ContentTypes {
   TEXT = "TEXT",
   SELECT = "SELECT",
 }
+
+const NAME_PREFIX = "maxchang ~ % ";
 
 export default function MainTerminal({
   isTerminalActive,
@@ -21,49 +28,26 @@ export default function MainTerminal({
   ]);
 
   // Active content is the content that the user is currently typing
-  const [activeContent, setActiveContent] = useState("");
+  const [activeCommands, setActiveCommands] = useState<string>("");
+  const [activeSelectData, setActiveSelectData] = useState<
+    TerminalSelectData[]
+  >([]);
   const [activeContentType, setActiveContentType] = useState<ContentTypes>(
-    ContentTypes.SELECT
+    ContentTypes.TEXT
   );
 
   const terminalRef = useRef<HTMLDivElement>(null);
-
-  const items = [
-    {
-      label: "First",
-      value: "first",
-    },
-    {
-      label: "Second",
-      value: "second",
-    },
-    {
-      label: "Third",
-      value: "third",
-    },
-  ];
-
-  const data = {
-    header: ["Name", "Age", "Occupation"],
-    rows: [
-      [
-        "Alice",
-        24,
-        ["link", "Engineer", "https://github.com/changhoetyng/noggingblog-api"],
-      ],
-    ],
-  };
 
   useEffect(() => {
     function handleKeypress(e: KeyboardEvent) {
       e.preventDefault();
       if (e.key === "Enter") {
-        addTerminalContent(activeContent);
-        setActiveContent("");
+        addTerminalContent();
+        setActiveCommands("");
       } else if (e.key === "Backspace") {
-        setActiveContent((prevContent) => prevContent.slice(0, -1));
+        setActiveCommands((prevContent) => prevContent.slice(0, -1));
       } else if (e.key.length === 1) {
-        setActiveContent((prevContent) => prevContent + e.key);
+        setActiveCommands((prevContent) => prevContent + e.key);
       }
     }
 
@@ -77,7 +61,7 @@ export default function MainTerminal({
     return () => {
       window.removeEventListener("keydown", handleKeypress);
     };
-  }, [isTerminalActive, activeContent]);
+  }, [isTerminalActive, activeCommands]);
 
   useEffect(() => {
     if (terminalRef.current) {
@@ -86,8 +70,36 @@ export default function MainTerminal({
     }
   }, [terminalContents]);
 
-  function addTerminalContent(content: string) {
-    setTerminalContents((prevContents) => [...prevContents, content]);
+  function addTerminalContent() {
+    const output = processTerminalCommand(activeCommands);
+    if (typeof output === "string") {
+      setTerminalContents((prevContents) => [
+        ...prevContents,
+        NAME_PREFIX + activeCommands,
+        output,
+      ]);
+    } else if (Array.isArray(output) && output.every(isTerminalSelectData)) {
+      setTerminalContents((prevContents) => [
+        ...prevContents,
+        NAME_PREFIX + activeCommands,
+      ]);
+      setActiveContentType(ContentTypes.SELECT);
+      setActiveSelectData(output);
+    }
+  }
+
+  function renderContent() {
+    if (activeContentType === ContentTypes.TEXT) {
+      return (
+        <TextTerminal isActive={true}>
+          {NAME_PREFIX}
+          {activeCommands}
+        </TextTerminal>
+      );
+    } else if (activeContentType === ContentTypes.SELECT) {
+      return <SelectTerminal data={activeSelectData} isActive={true} />;
+    }
+    return null;
   }
 
   return (
@@ -98,11 +110,8 @@ export default function MainTerminal({
             {content}
           </TextTerminal>
         ))}
-        <TextTerminal isActive={true} onEnter={addTerminalContent}>
-          maxchang ~ % {activeContent}
-        </TextTerminal>
-        <SelectTerminal data={items} isActive={true} />
-        <TableTerminal data={data} isActive={true} />
+
+        {renderContent()}
       </BoxTerminal>
     </div>
   );
