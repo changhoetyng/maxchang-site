@@ -2,7 +2,7 @@ import BoxTerminal from "./terminal/BoxTerminal";
 import SelectTerminal from "./terminal/SelectTerminal";
 import TableTerminal from "./terminal/TableTerminal";
 import TextTerminal from "./terminal/TextTerminal";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 enum ContentTypes {
   TEXT = "TEXT",
@@ -26,7 +26,7 @@ export default function MainTerminal({
     ContentTypes.SELECT
   );
 
-  // active selection for the select terminal
+  const terminalRef = useRef<HTMLDivElement>(null);
 
   const items = [
     {
@@ -78,13 +78,21 @@ export default function MainTerminal({
       window.removeEventListener("keydown", handleKeypress);
     };
   }, [isTerminalActive, activeContent]);
+
+  useEffect(() => {
+    if (terminalRef.current) {
+      //
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    }
+  }, [terminalContents]);
+
   function addTerminalContent(content: string) {
     setTerminalContents((prevContents) => [...prevContents, content]);
   }
 
   return (
     <div className="w-3/6 h-48 mr-14 max-w-5xl border-green-500 border">
-      <BoxTerminal>
+      <BoxTerminal ref={terminalRef}>
         {terminalContents.map((content, idx) => (
           <TextTerminal isActive={false} key={content + idx}>
             {content}
