@@ -2,6 +2,8 @@ import PortfolioBody from "./components/PortfolioBody";
 import { Parallax, ParallaxLayer } from "@react-spring/parallax";
 import Introduction from "./components/Introduction";
 import MainTerminal from "./components/MainTerminal";
+import PowerpointView from "./components/powerpoint/PowerpointView";
+import MainPowerpoint from "./components/MainPowerpoint";
 
 export default function Portfolio() {
   const HEADER_HEIGHT = 64;
@@ -42,7 +44,7 @@ export default function Portfolio() {
                 justifyContent: "flex-end",
               }}
             >
-              <MainTerminal isTerminalActive={true} />
+              <MainTerminal isTerminalActive={false} />
             </ParallaxLayer>
             <ParallaxLayer
               offset={1}
@@ -62,7 +64,7 @@ export default function Portfolio() {
                 justifyContent: "flex-end",
               }}
             >
-              <Introduction />
+              <MainPowerpoint />
             </ParallaxLayer>
             <ParallaxLayer
               offset={2}
