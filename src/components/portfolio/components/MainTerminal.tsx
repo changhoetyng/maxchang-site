@@ -1,9 +1,11 @@
+import { useEffect, useState, useRef } from "react";
 import BoxTerminal from "./terminal/BoxTerminal";
 import SelectTerminal from "./terminal/SelectTerminal";
-import TableTerminal from "./terminal/TableTerminal";
 import TextTerminal from "./terminal/TextTerminal";
-import { processTerminalCommand } from "@/components/portfolio/utils/TerminalProcessor";
-import { useEffect, useState, useRef } from "react";
+import {
+  onClickContact,
+  processTerminalCommand,
+} from "@/components/portfolio/utils/TerminalProcessor";
 import {
   isTerminalSelectData,
   type TerminalSelectData,
@@ -19,15 +21,10 @@ const NAME_PREFIX = "maxchang ~ % ";
 export default function MainTerminal({
   isTerminalActive,
 }: Readonly<{ isTerminalActive: boolean }>) {
-  // Terminal contents is the content that the user has typed
   const [terminalContents, setTerminalContents] = useState([
     "Welcome to My Portfolio! - I’m a Software Engineer",
   ]);
-  const [contentTypes, setContentTypes] = useState<ContentTypes[]>([
-    ContentTypes.TEXT,
-  ]);
 
-  // Active content is the content that the user is currently typing
   const [activeCommands, setActiveCommands] = useState<string>("");
   const [activeSelectData, setActiveSelectData] = useState<
     TerminalSelectData[]
@@ -38,12 +35,25 @@ export default function MainTerminal({
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
+  function onEnterSelection(value: string) {
+    if (activeContentType === ContentTypes.SELECT) {
+      onClickContact(value);
+      setActiveContentType(ContentTypes.TEXT);
+    }
+  }
+
+  function onEnterTerminal() {
+    if (activeContentType === ContentTypes.TEXT) {
+      addTerminalContent(activeCommands);
+      setActiveCommands("");
+    }
+  }
+
   useEffect(() => {
     function handleKeypress(e: KeyboardEvent) {
       e.preventDefault();
       if (e.key === "Enter") {
-        addTerminalContent();
-        setActiveCommands("");
+        onEnterTerminal();
       } else if (e.key === "Backspace") {
         setActiveCommands((prevContent) => prevContent.slice(0, -1));
       } else if (e.key.length === 1) {
@@ -57,7 +67,6 @@ export default function MainTerminal({
       window.removeEventListener("keydown", handleKeypress);
     }
 
-    // Cleanup the event listener on component unmount or when isTerminalActive changes
     return () => {
       window.removeEventListener("keydown", handleKeypress);
     };
@@ -65,23 +74,28 @@ export default function MainTerminal({
 
   useEffect(() => {
     if (terminalRef.current) {
-      //
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
   }, [terminalContents]);
 
-  function addTerminalContent() {
-    const output = processTerminalCommand(activeCommands);
-    if (typeof output === "string") {
+  function addTerminalContent(content: string) {
+    const output = processTerminalCommand(content);
+    if (content.trim() === "") {
       setTerminalContents((prevContents) => [
         ...prevContents,
-        NAME_PREFIX + activeCommands,
+        NAME_PREFIX + content,
+      ]);
+    } else if (typeof output === "string") {
+      setTerminalContents((prevContents) => [
+        ...prevContents,
+        NAME_PREFIX + content,
         output,
       ]);
+      setActiveCommands("");
     } else if (Array.isArray(output) && output.every(isTerminalSelectData)) {
       setTerminalContents((prevContents) => [
         ...prevContents,
-        NAME_PREFIX + activeCommands,
+        NAME_PREFIX + content,
       ]);
       setActiveContentType(ContentTypes.SELECT);
       setActiveSelectData(output);
@@ -97,7 +111,13 @@ export default function MainTerminal({
         </TextTerminal>
       );
     } else if (activeContentType === ContentTypes.SELECT) {
-      return <SelectTerminal data={activeSelectData} isActive={true} />;
+      return (
+        <SelectTerminal
+          data={activeSelectData}
+          isActive={true}
+          onEnter={onEnterSelection}
+        />
+      );
     }
     return null;
   }
@@ -110,7 +130,6 @@ export default function MainTerminal({
             {content}
           </TextTerminal>
         ))}
-
         {renderContent()}
       </BoxTerminal>
     </div>

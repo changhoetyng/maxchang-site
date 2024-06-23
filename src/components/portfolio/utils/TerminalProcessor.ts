@@ -5,7 +5,6 @@ import type {
 } from "@/types/terminal";
 
 const CONTACT_OPTIONS: TerminalSelectData[] = [
-  { label: "Email", value: "email" },
   { label: "LinkedIn", value: "linkedin" },
   { label: "GitHub", value: "github" },
 ];
@@ -25,7 +24,19 @@ export function processTerminalCommand(command: string): TerminalMode {
       return PROJECTS_OPTIONS;
     case "contact":
       return CONTACT_OPTIONS;
+    case "":
+      return "maxchang ~ % ";
     default:
       return "zsh: command not found: -v";
+  }
+}
+
+export function onClickContact(value: string) {
+  switch (value) {
+    case "github":
+      window.open("https://github.com/changhoetyng", "_blank");
+      break;
+    case "linkedin":
+      window.open("https://www.linkedin.com/in/hoe-tyng-chang", "_blank");
   }
 }
