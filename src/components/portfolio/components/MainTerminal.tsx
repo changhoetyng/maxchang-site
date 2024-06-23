@@ -1,36 +1,39 @@
 import { useEffect, useState, useRef } from "react";
 import BoxTerminal from "./terminal/BoxTerminal";
-import SelectTerminal from "./terminal/SelectTerminal";
-import TextTerminal from "./terminal/TextTerminal";
 import {
+  TerminalInputProcessor,
   onClickContact,
-  processTerminalCommand,
+  renderContent,
 } from "@/components/portfolio/utils/TerminalProcessor";
 import {
-  isTerminalSelectData,
+  ContentTypes,
   type TerminalSelectData,
+  type TerminalTableData,
 } from "@/types/terminal";
-
-enum ContentTypes {
-  TEXT = "TEXT",
-  SELECT = "SELECT",
-}
-
-const NAME_PREFIX = "maxchang ~ % ";
 
 export default function MainTerminal({
   isTerminalActive,
 }: Readonly<{ isTerminalActive: boolean }>) {
-  const [terminalContents, setTerminalContents] = useState([
-    "Welcome to My Portfolio! - I’m a Software Engineer",
+  const [terminalContents, setTerminalContents] = useState<
+    (string | TerminalTableData)[]
+  >(["Welcome to My Portfolio! - I’m a Software Engineer"]);
+  const [contentTypes, setContentTypes] = useState<ContentTypes[]>([
+    ContentTypes.TEXT,
   ]);
 
-  const [activeCommands, setActiveCommands] = useState<string>("");
-  const [activeSelectData, setActiveSelectData] = useState<
-    TerminalSelectData[]
-  >([]);
+  // Active Content
+  const [activeCommands, setActiveCommands] = useState<
+    string | TerminalSelectData[] | TerminalTableData
+  >("");
   const [activeContentType, setActiveContentType] = useState<ContentTypes>(
     ContentTypes.TEXT
+  );
+
+  const terminalInputProcessor = new TerminalInputProcessor(
+    setTerminalContents,
+    setContentTypes,
+    setActiveCommands,
+    setActiveContentType
   );
 
   const terminalRef = useRef<HTMLDivElement>(null);
@@ -38,14 +41,14 @@ export default function MainTerminal({
   function onEnterSelection(value: string) {
     if (activeContentType === ContentTypes.SELECT) {
       onClickContact(value);
+      setActiveCommands("");
       setActiveContentType(ContentTypes.TEXT);
     }
   }
 
   function onEnterTerminal() {
     if (activeContentType === ContentTypes.TEXT) {
-      addTerminalContent(activeCommands);
-      setActiveCommands("");
+      terminalInputProcessor.addTerminalContent(activeCommands as string);
     }
   }
 
@@ -55,9 +58,15 @@ export default function MainTerminal({
       if (e.key === "Enter") {
         onEnterTerminal();
       } else if (e.key === "Backspace") {
-        setActiveCommands((prevContent) => prevContent.slice(0, -1));
+        if (typeof activeCommands === "string") {
+          setActiveCommands((prevContent) =>
+            (prevContent as string).slice(0, -1)
+          );
+        }
       } else if (e.key.length === 1) {
-        setActiveCommands((prevContent) => prevContent + e.key);
+        if (typeof activeCommands === "string") {
+          setActiveCommands((prevContent) => (prevContent as string) + e.key);
+        }
       }
     }
 
@@ -78,59 +87,27 @@ export default function MainTerminal({
     }
   }, [terminalContents]);
 
-  function addTerminalContent(content: string) {
-    const output = processTerminalCommand(content);
-    if (content.trim() === "") {
-      setTerminalContents((prevContents) => [
-        ...prevContents,
-        NAME_PREFIX + content,
-      ]);
-    } else if (typeof output === "string") {
-      setTerminalContents((prevContents) => [
-        ...prevContents,
-        NAME_PREFIX + content,
-        output,
-      ]);
-      setActiveCommands("");
-    } else if (Array.isArray(output) && output.every(isTerminalSelectData)) {
-      setTerminalContents((prevContents) => [
-        ...prevContents,
-        NAME_PREFIX + content,
-      ]);
-      setActiveContentType(ContentTypes.SELECT);
-      setActiveSelectData(output);
-    }
-  }
-
-  function renderContent() {
-    if (activeContentType === ContentTypes.TEXT) {
-      return (
-        <TextTerminal isActive={true}>
-          {NAME_PREFIX}
-          {activeCommands}
-        </TextTerminal>
-      );
-    } else if (activeContentType === ContentTypes.SELECT) {
-      return (
-        <SelectTerminal
-          data={activeSelectData}
-          isActive={true}
-          onEnter={onEnterSelection}
-        />
-      );
-    }
-    return null;
-  }
-
   return (
-    <div className="w-3/6 h-48 mr-14 max-w-5xl border-green-500 border">
+    <div className="w-3/6 h-80 mr-14 max-w-5xl border-green-500 border">
       <BoxTerminal ref={terminalRef}>
-        {terminalContents.map((content, idx) => (
-          <TextTerminal isActive={false} key={content + idx}>
-            {content}
-          </TextTerminal>
-        ))}
-        {renderContent()}
+        {contentTypes.map((content, idx) =>
+          renderContent(
+            content,
+            onEnterSelection,
+            terminalContents[idx],
+            false,
+            false,
+            content + idx
+          )
+        )}
+        {renderContent(
+          activeContentType,
+          onEnterSelection,
+          activeCommands,
+          true,
+          true,
+          "active"
+        )}
       </BoxTerminal>
     </div>
   );

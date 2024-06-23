@@ -13,7 +13,7 @@ export default function TableTerminal({
             href={cell[2]}
             className="text-green-500 underline"
           >
-            {cell[0]}
+            {cell[1]}
           </a>
         );
       }
