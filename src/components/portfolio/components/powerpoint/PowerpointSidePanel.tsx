@@ -3,8 +3,8 @@ export default function PowerpointSidePanel({
 }: {
   data: React.ReactNode[];
 }) {
-  const originalHeight = 800;
-  const originalWidth = 800;
+  const originalHeight = 340;
+  const originalWidth = 600;
   const scale = 0.3;
   return data.map((child, index) => (
     <div
@@ -18,12 +18,7 @@ export default function PowerpointSidePanel({
       <div
         style={{ transform: "scale(0.3, 0.3)", transformOrigin: "top left" }}
       >
-        <div
-          className="flex items-center justify-center bg-white w-full mb-6"
-          style={{ height: "800px", width: "800px" }}
-        >
-          {child}
-        </div>
+        {child}
       </div>
     </div>
   ));
