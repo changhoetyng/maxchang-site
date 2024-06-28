@@ -1,17 +1,10 @@
+import React from "react";
+import SlideContent from "./SlideTableContent";
 import PowerpointSidePanel from "./PowerpointSidePanel";
-
-function test() {
-  return (
-    <div
-      className="flex items-center justify-center bg-white w-full mb-6 relative"
-      style={{ height: "340px", width: "600px" }}
-    >
-      <div className="bg-pink-500">Hello</div>
-    </div>
-  );
-}
+import { useWindowDimensions } from "./UseWindowDimensions";
 
 export default function PowerpointView() {
+  const dimensions = useWindowDimensions();
   return (
     <div className="flex flex-col bg-white rounded-lg shadow-lg font-andale-mono whitespace-pre-wrap w-full h-full">
       <div className="flex items-center justify-between px-4 py-2 bg-gray-900 rounded-t-lg">
@@ -22,10 +15,9 @@ export default function PowerpointView() {
         </div>
       </div>
       <div className="flex flex-row" style={{ height: "calc(100% - 28px)" }}>
-        <div className="h-full bg-indigo-800 p-6">
-          <PowerpointSidePanel data={[test(), test()]} />
+        <div className="p-6 bg-green-400 w-fit h-fit">
+          <SlideContent />
         </div>
-        <div className="w-full h-full bg-green-400">{test()}</div>
       </div>
     </div>
   );
