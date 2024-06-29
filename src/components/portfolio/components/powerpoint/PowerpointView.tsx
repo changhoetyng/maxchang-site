@@ -15,8 +15,18 @@ export default function PowerpointView() {
         </div>
       </div>
       <div className="flex flex-row" style={{ height: "calc(100% - 28px)" }}>
-        <div className="p-6 bg-green-400 w-fit h-fit">
-          <SlideContent />
+        <div className="bg-pink-300">
+          <PowerpointSidePanel
+            data={[
+              <SlideContent isSidePanel={true} key={"sad"} />,
+              <SlideContent isSidePanel={true} key={"saawdd"} />,
+            ]}
+          />
+        </div>
+        <div className=" bg-green-400 w-full h-full flex items-center justify-center">
+          <div>
+            <SlideContent isSidePanel={false} />
+          </div>
         </div>
       </div>
     </div>
