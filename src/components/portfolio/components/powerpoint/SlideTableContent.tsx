@@ -1,4 +1,9 @@
-function SlideContent({ isSidePanel }: Readonly<{ isSidePanel: boolean }>) {
+import type React from "react";
+
+function SlideContent({
+  isSidePanel,
+  children,
+}: Readonly<{ isSidePanel: boolean; children: React.ReactNode }>) {
   const styles = {
     transformOrigin: "top left",
     width: "100%",
@@ -15,8 +20,7 @@ function SlideContent({ isSidePanel }: Readonly<{ isSidePanel: boolean }>) {
           fontSize: !isSidePanel ? "2vw" : "0.5em",
         }}
       >
-        <p className="bg-pink-500">Hello World!</p>
-        <img alt="placeholder" className="h-1/6" src={"/max.jpeg"} />
+        {children}
       </div>
     </div>
   );
