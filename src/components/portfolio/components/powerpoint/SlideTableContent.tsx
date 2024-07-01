@@ -8,14 +8,15 @@ function SlideContent({ isSidePanel }: Readonly<{ isSidePanel: boolean }>) {
   return (
     <div style={styles}>
       <div
-        className="flex items-center justify-center bg-white mb-6 relative"
+        className="flex flex-col items-center justify-center bg-white relative"
         style={{
-          height: !isSidePanel ? "20vw" : "100px",
-          width: !isSidePanel ? "30vw" : "150px",
+          height: !isSidePanel ? "25vw" : "100px",
+          width: !isSidePanel ? "40vw" : "150px",
+          fontSize: !isSidePanel ? "2vw" : "0.5em",
         }}
       >
+        <p className="bg-pink-500">Hello World!</p>
         <img alt="placeholder" className="h-1/6" src={"/max.jpeg"} />
-        <h1 className="bg-pink-500">Hello</h1>
       </div>
     </div>
   );

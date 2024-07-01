@@ -2,7 +2,6 @@ import PortfolioBody from "./components/PortfolioBody";
 import { Parallax, ParallaxLayer } from "@react-spring/parallax";
 import Introduction from "./components/Introduction";
 import MainTerminal from "./components/MainTerminal";
-import PowerpointView from "./components/powerpoint/PowerpointView";
 import MainPowerpoint from "./components/MainPowerpoint";
 
 export default function Portfolio() {
@@ -54,7 +53,9 @@ export default function Portfolio() {
                 justifyContent: "flex-start",
               }}
             >
-              <Introduction />
+              <div className="text-white ml-12">
+                <h1 className="text-4xl">About Me</h1>
+              </div>
             </ParallaxLayer>
             <ParallaxLayer
               offset={1}

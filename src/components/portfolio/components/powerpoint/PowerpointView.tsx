@@ -1,10 +1,7 @@
-import React from "react";
 import SlideContent from "./SlideTableContent";
 import PowerpointSidePanel from "./PowerpointSidePanel";
-import { useWindowDimensions } from "./UseWindowDimensions";
 
 export default function PowerpointView() {
-  const dimensions = useWindowDimensions();
   return (
     <div className="flex flex-col bg-white rounded-lg shadow-lg font-andale-mono whitespace-pre-wrap w-full h-full">
       <div className="flex items-center justify-between px-4 py-2 bg-gray-900 rounded-t-lg">
