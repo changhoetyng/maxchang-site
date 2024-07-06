@@ -65,7 +65,7 @@ export default function Portfolio() {
                 justifyContent: "flex-end",
               }}
             >
-              <MainPowerpoint />
+              <MainPowerpoint isPowerpointActive={true} />
             </ParallaxLayer>
             <ParallaxLayer
               offset={2}
