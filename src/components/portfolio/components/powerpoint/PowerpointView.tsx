@@ -1,5 +1,6 @@
 import SlideContent from "./SlideTableContent";
 import PowerpointSidePanel from "./PowerpointSidePanel";
+import "./PowerpointView.css";
 
 export default function PowerpointView() {
   return (
@@ -12,17 +13,53 @@ export default function PowerpointView() {
         </div>
       </div>
       <div className="flex flex-row" style={{ height: "calc(100% - 28px)" }}>
-        <div className="bg-pink-300">
+        <div
+          className="bg-pink-300 overflow-y-auto scrollbar"
+          style={{ minWidth: "180px", width: "180px" }}
+        >
           <PowerpointSidePanel
             data={[
-              <SlideContent isSidePanel={true} key={"sad"} />,
-              <SlideContent isSidePanel={true} key={"saawdd"} />,
+              <SlideContent isSidePanel={true} key={"sad"}>
+                <p className="bg-pink-500">Hello World!</p>
+                <img alt="placeholder" className="h-1/6" src={"/max.jpeg"} />
+              </SlideContent>,
+              <SlideContent isSidePanel={true} key={"sad"}>
+                <p className="bg-pink-500">Hello World!</p>
+                <img alt="placeholder" className="h-1/6" src={"/max.jpeg"} />
+              </SlideContent>,
+              <SlideContent isSidePanel={true} key={"sad"}>
+                <p className="bg-pink-500">Hello World!</p>
+                <img alt="placeholder" className="h-1/6" src={"/max.jpeg"} />
+              </SlideContent>,
+              <SlideContent isSidePanel={true} key={"sad"}>
+                <p className="bg-pink-500">Hello World!</p>
+                <img alt="placeholder" className="h-1/6" src={"/max.jpeg"} />
+              </SlideContent>,
+              <SlideContent isSidePanel={true} key={"sad"}>
+                <p className="bg-pink-500">Hello World!</p>
+                <img alt="placeholder" className="h-1/6" src={"/max.jpeg"} />
+              </SlideContent>,
+              <SlideContent isSidePanel={true} key={"sad"}>
+                <p className="bg-pink-500">Hello World!</p>
+                <img alt="placeholder" className="h-1/6" src={"/max.jpeg"} />
+              </SlideContent>,
+              <SlideContent isSidePanel={true} key={"sad"}>
+                <p className="bg-pink-500">Hello World!</p>
+                <img alt="placeholder" className="h-1/6" src={"/max.jpeg"} />
+              </SlideContent>,
+              <SlideContent isSidePanel={true} key={"sad"}>
+                <p className="bg-pink-500">Hello World!</p>
+                <img alt="placeholder" className="h-1/6" src={"/max.jpeg"} />
+              </SlideContent>,
             ]}
           />
         </div>
         <div className=" bg-green-400 w-full h-full flex items-center justify-center">
           <div>
-            <SlideContent isSidePanel={false} />
+            <SlideContent isSidePanel={false}>
+              <p className="bg-pink-500">Hello World!</p>
+              <img alt="placeholder" className="h-1/6" src={"/max.jpeg"} />
+            </SlideContent>
           </div>
         </div>
       </div>
