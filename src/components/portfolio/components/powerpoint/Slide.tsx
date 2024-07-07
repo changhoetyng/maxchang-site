@@ -3,10 +3,10 @@ import SlideContent from "./SlideTableContent";
 export default function Slide({
   isSidePanel,
   page,
-}: {
+}: Readonly<{
   isSidePanel: boolean;
   page: string;
-}) {
+}>) {
   return (
     <SlideContent isSidePanel={isSidePanel}>
       <img

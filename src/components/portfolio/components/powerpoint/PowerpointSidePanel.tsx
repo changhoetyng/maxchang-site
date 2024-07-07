@@ -20,7 +20,7 @@ export default function PowerpointSidePanel({
           className="w-fit p-3 flex flex-row text-xs"
         >
           {index + 1}.
-          <div
+          <button
             onClick={() => onClickSideBar(index)}
             className={clsx(
               selectedIndex == index ? "border-2 border-orange-400" : "",
@@ -28,7 +28,7 @@ export default function PowerpointSidePanel({
             )}
           >
             {child}
-          </div>
+          </button>
         </div>
       ))}
     </div>
