@@ -10,9 +10,9 @@ import Slide from "./Slide";
 
 export default function PowerpointView({
   isPowerpointActive,
-}: {
+}: Readonly<{
   isPowerpointActive: boolean;
-}) {
+}>) {
   const sidePanelRef = useRef<HTMLDivElement>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const zoomComponent = useRef<ReactZoomPanPinchRef | null>(null);
