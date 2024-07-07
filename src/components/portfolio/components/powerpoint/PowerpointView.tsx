@@ -4,6 +4,11 @@ import "./PowerpointView.css";
 import SlideOne from "./slides/SlideOne";
 import { useEffect, useRef, useState } from "react";
 import SlideTwo from "./slides/SlideTwo";
+import {
+  TransformWrapper,
+  TransformComponent,
+  type ReactZoomPanPinchRef,
+} from "react-zoom-pan-pinch";
 
 export default function PowerpointView({
   isPowerpointActive,
@@ -12,6 +17,7 @@ export default function PowerpointView({
 }) {
   const sidePanelRef = useRef<HTMLDivElement>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const zoomComponent = useRef<ReactZoomPanPinchRef | null>(null);
 
   const SLIDES_SIDE_PANEL = [
     <SlideOne key={"1"} isSidePanel={true} />,
@@ -35,6 +41,18 @@ export default function PowerpointView({
     <SlideOne key={"8"} isSidePanel={false} />,
   ];
 
+  async function resetSlide() {
+    zoomComponent.current?.centerView(1, 0, undefined);
+  }
+
+  async function zoomIn() {
+    zoomComponent.current?.zoomIn();
+  }
+
+  async function zoomOut() {
+    zoomComponent.current?.zoomOut();
+  }
+
   useEffect(() => {
     function handleKeypress(e: KeyboardEvent) {
       if (e.key === "ArrowDown") {
@@ -42,11 +60,13 @@ export default function PowerpointView({
         setCurrentSlide((prevSlide) =>
           prevSlide === SLIDES.length - 1 ? prevSlide : prevSlide + 1
         );
+        resetSlide();
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         setCurrentSlide((prevSlide) =>
           prevSlide === 0 ? prevSlide : prevSlide - 1
         );
+        resetSlide();
       }
     }
     if (isPowerpointActive) {
@@ -93,12 +113,37 @@ export default function PowerpointView({
             selectedIndex={currentSlide}
           />
         </div>
-        <div className=" bg-gray-200 w-full h-full flex items-center justify-center">
-          <div>{SLIDES[currentSlide]}</div>
-        </div>
+        <TransformWrapper
+          centerOnInit={true}
+          limitToBounds={false}
+          ref={zoomComponent}
+        >
+          <TransformComponent
+            wrapperStyle={{
+              width: "100%",
+              height: "100%",
+              backgroundColor: "#e5e7eb",
+            }}
+          >
+            <div className="cursor-pointer h-full w-full">
+              <div>{SLIDES[currentSlide]}</div>
+            </div>
+          </TransformComponent>
+        </TransformWrapper>
       </div>
-      <footer className="flex bg-gray-900 text-gray-200 text-xs rounded-b-lg pt-1 pb-1 pl-6">
+      <footer className="flex bg-gray-900 text-gray-200 text-xs rounded-b-lg pt-1 pb-1 pl-6 relative">
         Slides {currentSlide + 1}/{SLIDES.length}
+        <div className="absolute right-3 flex text-center">
+          <button className="cursor-pointer h-full mx-4" onClick={zoomIn}>
+            Zoom In
+          </button>
+          <button className="cursor-pointer h-full mx-4" onClick={zoomOut}>
+            Zoom Out
+          </button>
+          <button className="cursor-pointer h-full mx-3" onClick={resetSlide}>
+            Reset Zoom
+          </button>
+        </div>
       </footer>
     </div>
   );

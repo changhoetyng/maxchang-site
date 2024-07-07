@@ -1,10 +1,26 @@
 import SlideContent from "../SlideTableContent";
+import {
+  TransformWrapper,
+  TransformComponent,
+  useControls,
+} from "react-zoom-pan-pinch";
+
+function Controls() {
+  const { zoomIn, zoomOut, resetTransform } = useControls();
+
+  return (
+    <div className="tools">
+      <button onClick={() => zoomIn()}>Zoom In</button>
+      <button onClick={() => zoomOut()}>-</button>
+      <button onClick={() => resetTransform()}>x</button>
+    </div>
+  );
+}
 
 export default function SlideTwo({ isSidePanel }: { isSidePanel: boolean }) {
   return (
     <SlideContent isSidePanel={isSidePanel}>
-      <p className="bg-pink-500">Slide Two</p>
-      <img alt="placeholder" className="h-1/6" src={"/max.jpeg"} />
+      <img src={"/2.svg"} className="App-logo" alt="logo" />
     </SlideContent>
   );
 }
