@@ -1,14 +1,12 @@
-import SlideContent from "./SlideTableContent";
 import PowerpointSidePanel from "./PowerpointSidePanel";
 import "./PowerpointView.css";
-import SlideOne from "./slides/SlideOne";
 import { useEffect, useRef, useState } from "react";
-import SlideTwo from "./slides/SlideTwo";
 import {
   TransformWrapper,
   TransformComponent,
   type ReactZoomPanPinchRef,
 } from "react-zoom-pan-pinch";
+import Slide from "./slides/Slide";
 
 export default function PowerpointView({
   isPowerpointActive,
@@ -20,25 +18,13 @@ export default function PowerpointView({
   const zoomComponent = useRef<ReactZoomPanPinchRef | null>(null);
 
   const SLIDES_SIDE_PANEL = [
-    <SlideOne key={"1"} isSidePanel={true} />,
-    <SlideTwo key={"2"} isSidePanel={true} />,
-    <SlideOne key={"3"} isSidePanel={true} />,
-    <SlideOne key={"4"} isSidePanel={true} />,
-    <SlideOne key={"5"} isSidePanel={true} />,
-    <SlideOne key={"6"} isSidePanel={true} />,
-    <SlideOne key={"7"} isSidePanel={true} />,
-    <SlideOne key={"8"} isSidePanel={true} />,
+    <Slide key={"1"} isSidePanel={true} page="page1" />,
+    <Slide key={"2"} isSidePanel={true} page="page2" />,
   ];
 
   const SLIDES = [
-    <SlideOne key={"1"} isSidePanel={false} />,
-    <SlideTwo key={"2"} isSidePanel={false} />,
-    <SlideOne key={"3"} isSidePanel={false} />,
-    <SlideOne key={"4"} isSidePanel={false} />,
-    <SlideOne key={"5"} isSidePanel={false} />,
-    <SlideOne key={"6"} isSidePanel={false} />,
-    <SlideOne key={"7"} isSidePanel={false} />,
-    <SlideOne key={"8"} isSidePanel={false} />,
+    <Slide key={"1"} isSidePanel={false} page="page1" />,
+    <Slide key={"2"} isSidePanel={false} page="page2" />,
   ];
 
   async function resetSlide() {
@@ -109,7 +95,7 @@ export default function PowerpointView({
       </div>
       <div className="flex flex-row" style={{ height: "calc(100% - 28px)" }}>
         <div
-          className="bg-gray-200 overflow-y-auto scrollbar"
+          className="bg-gray-300 overflow-y-auto scrollbar"
           style={{ minWidth: "200px", maxWidth: "200px" }}
           ref={sidePanelRef}
         >
