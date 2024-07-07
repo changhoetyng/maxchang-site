@@ -6,7 +6,7 @@ import {
   TransformComponent,
   type ReactZoomPanPinchRef,
 } from "react-zoom-pan-pinch";
-import Slide from "./slides/Slide";
+import Slide from "./Slide";
 
 export default function PowerpointView({
   isPowerpointActive,

@@ -1,4 +1,4 @@
-import SlideContent from "../SlideTableContent";
+import SlideContent from "./SlideTableContent";
 
 export default function Slide({
   isSidePanel,
