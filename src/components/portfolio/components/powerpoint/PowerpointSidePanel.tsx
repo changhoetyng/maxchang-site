@@ -3,10 +3,15 @@ import clsx from "clsx";
 export default function PowerpointSidePanel({
   data,
   selectedIndex,
-}: {
+  onClickSlide,
+}: Readonly<{
   data: React.ReactNode[];
   selectedIndex: number;
-}) {
+  onClickSlide: (index: number) => void;
+}>) {
+  function onClickSideBar(index: number) {
+    onClickSlide(index);
+  }
   return (
     <div style={{ minWidth: "200px", maxWidth: "200px" }}>
       {data.map((child, index) => (
@@ -16,8 +21,10 @@ export default function PowerpointSidePanel({
         >
           {index + 1}.
           <div
+            onClick={() => onClickSideBar(index)}
             className={clsx(
-              selectedIndex == index ? "border-2 border-orange-400" : ""
+              selectedIndex == index ? "border-2 border-orange-400" : "",
+              "cursor-pointer"
             )}
           >
             {child}

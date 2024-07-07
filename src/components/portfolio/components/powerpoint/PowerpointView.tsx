@@ -80,6 +80,11 @@ export default function PowerpointView({
     };
   }, [isPowerpointActive]);
 
+  function onClickSlide(index: number) {
+    setCurrentSlide(index);
+    resetSlide();
+  }
+
   useEffect(() => {
     if (sidePanelRef.current) {
       const sidePanel = sidePanelRef.current;
@@ -111,6 +116,7 @@ export default function PowerpointView({
           <PowerpointSidePanel
             data={SLIDES_SIDE_PANEL}
             selectedIndex={currentSlide}
+            onClickSlide={onClickSlide}
           />
         </div>
         <TransformWrapper
@@ -125,7 +131,7 @@ export default function PowerpointView({
               backgroundColor: "#e5e7eb",
             }}
           >
-            <div className="cursor-pointer h-full w-full">
+            <div className="cursor-move h-full w-full">
               <div>{SLIDES[currentSlide]}</div>
             </div>
           </TransformComponent>
