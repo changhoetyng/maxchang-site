@@ -72,17 +72,7 @@ export default function Portfolio() {
               speed={0.5}
               style={{
                 ...alignCenter,
-                justifyContent: "flex-start",
-              }}
-            >
-              <Introduction />
-            </ParallaxLayer>
-            <ParallaxLayer
-              offset={2}
-              speed={1}
-              style={{
-                ...alignCenter,
-                justifyContent: "flex-end",
+                justifyContent: "center",
               }}
             >
               <Introduction />
