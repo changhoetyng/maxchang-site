@@ -20,11 +20,13 @@ export default function PowerpointView({
   const SLIDES_SIDE_PANEL = [
     <Slide key={"1"} isSidePanel={true} page="page1" />,
     <Slide key={"2"} isSidePanel={true} page="page2" />,
+    <Slide key={"3"} isSidePanel={true} page="page3" />,
   ];
 
   const SLIDES = [
     <Slide key={"1"} isSidePanel={false} page="page1" />,
     <Slide key={"2"} isSidePanel={false} page="page2" />,
+    <Slide key={"3"} isSidePanel={false} page="page3" />,
   ];
 
   async function resetSlide() {
