@@ -6,3 +6,19 @@
     font-weight: normal;
     src: url('./font/ANDALEMO.woff') format('woff');
     }
+
+.no-select {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome, Opera, and Firefox */
+}
+
+.text-content {
+    display: inline-block;
+    padding: 0.25rem; /* Adjust padding as needed */
+    border-radius: 0.375rem; /* Adjust border radius as needed */
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 85px;
+  }

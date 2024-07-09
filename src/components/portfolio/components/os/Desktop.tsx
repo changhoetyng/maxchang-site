@@ -1,4 +1,5 @@
 import "./Desktop.css";
+import "@/globals.css";
 
 export default function Desktop({
   width,
@@ -13,7 +14,7 @@ export default function Desktop({
         <img
           src={"/wallpaper.jpg"}
           alt="desktop"
-          className="desktop-background"
+          className="desktop-background no-select"
         ></img>
         <div className="desktop-child">{children}</div>
       </div>
