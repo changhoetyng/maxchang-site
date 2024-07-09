@@ -3,6 +3,9 @@ import { Parallax, ParallaxLayer } from "@react-spring/parallax";
 import Introduction from "./components/Introduction";
 import MainTerminal from "./components/MainTerminal";
 import MainPowerpoint from "./components/MainPowerpoint";
+import Desktop from "./components/os/Desktop";
+import Icon from "./components/os/Icons/Icon";
+import ProjectList from "./components/ProjectList";
 
 export default function Portfolio() {
   const HEADER_HEIGHT = 64;
@@ -75,7 +78,7 @@ export default function Portfolio() {
                 justifyContent: "center",
               }}
             >
-              <Introduction />
+              <ProjectList />
             </ParallaxLayer>
           </Parallax>
         </div>
