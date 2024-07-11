@@ -1,27 +1,35 @@
 import Draggable from "react-draggable";
 import "@/globals.css";
 import clsx from "clsx";
-import { useState } from "react";
 
 export default function Icon({
-  icon,
+  name,
   className,
   iconSelections,
+  onClick,
+  selected,
+  onDoubleClick,
+  position,
 }: Readonly<{
-  icon: string;
+  name: string;
   className?: string;
   iconSelections: string;
+  onClick?: () => void;
+  onDoubleClick?: () => void;
+  selected: boolean;
+  position?: { x: number; y: number };
 }>) {
-  const [selected, setSelected] = useState(false);
-
   function clickHandler() {
-    setSelected(true);
+    if (onClick) {
+      onClick();
+    }
   }
 
   return (
-    <Draggable>
+    <Draggable position={position}>
       <button
-        onClick={() => clickHandler()}
+        onMouseDownCapture={() => clickHandler()}
+        onDoubleClick={() => (onDoubleClick ? onDoubleClick() : "")}
         className={clsx(
           className,
           "outline-none flex flex-col items-center justify-center"
@@ -30,7 +38,7 @@ export default function Icon({
         <img
           src={iconSelections}
           draggable="false"
-          alt={icon}
+          alt={iconSelections}
           className={clsx(
             "no-select",
             selected ? "border-2 border-gray-500" : ""
@@ -42,7 +50,7 @@ export default function Icon({
               "bg-blue-600": selected,
             })}
           >
-            google-cloud-sdk 2
+            {name}
           </p>
         </div>
       </button>
