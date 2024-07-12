@@ -1,18 +1,42 @@
 import { useState } from "react";
 import Desktop from "./os/Desktop";
 import Icon from "./os/Icons/Icon";
-import { FOLDER_ICON } from "./os/Icons/IconOptions";
+import { FOLDER_ICON, TEXT_EDIT_ICON } from "./os/Icons/IconOptions";
 import WindowComponent from "./os/WindowComponent";
 
 export default function ProjectList() {
   function onClickDesktop() {
     setSelectedFolder(selectedFolder.map((_) => false));
+    setSelectedPersonalProjects(selectedPersonalProjects.map((_) => false));
   }
   function onSelectFolder(idx: number) {
     setSelectedFolder(selectedFolder.map((_, index) => index === idx));
   }
 
   const [selectedFolder, setSelectedFolder] = useState([false, false]);
+
+  function onSelectFolderPersonalProjects(idx: number) {
+    setSelectedPersonalProjects(
+      selectedFolder.map((_, index) => index === idx)
+    );
+  }
+
+  const [selectedPersonalProjects, setSelectedPersonalProjects] = useState([
+    false,
+  ]);
+
+  const iconInPersonalProjects = [
+    <Icon
+      name={"Personal Projects"}
+      disabled={true}
+      iconSelections={TEXT_EDIT_ICON}
+      onClick={() => onSelectFolderPersonalProjects(0)}
+      onDoubleClick={() => console.log("Double Clicked")}
+      selected={selectedPersonalProjects[0]}
+      key={"personal-icon-1"}
+      position={{ x: 0, y: 0 }}
+    />,
+  ];
 
   const iconElement = [
     <Icon
@@ -44,7 +68,7 @@ export default function ProjectList() {
         width={"70%"}
         element={iconElement}
         onClick={onClickDesktop}
-        window={[<WindowComponent />]}
+        window={[<WindowComponent children={iconInPersonalProjects} />]}
       />
     </div>
   );

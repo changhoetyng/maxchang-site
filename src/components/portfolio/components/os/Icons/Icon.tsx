@@ -44,8 +44,8 @@ export default function Icon({
           className={clsx(
             "no-select",
             selected
-              ? "border-2 border-gray-500"
-              : "border-2 border-transparent"
+              ? "border bg-gray-600 border-gray-400"
+              : "border border-transparent"
           )}
         />
         <div className="text-container">
