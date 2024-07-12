@@ -1,0 +1,38 @@
+import Draggable from "react-draggable";
+import WindowHeader from "./WindowHeader";
+import Icon from "./Icons/Icon";
+import { TEXT_EDIT_ICON } from "./Icons/IconOptions";
+import { useState } from "react";
+
+export default function Window() {
+  const [selectedFolder, setSelectedFolder] = useState(true);
+
+  // const a = [1];
+  const a = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+  return (
+    <Draggable positionOffset={{ x: "50%", y: "50%" }}>
+      <div className="draggable-window">
+        <WindowHeader />
+        <div
+          className="flex flex-row bg-gray-500 relative"
+          style={{ height: "calc(100% - 28px)" }}
+        >
+          <div className="absolute top-0 left-0 h-fit max-h-full w-full inline-grid grid-cols-5 gap-2 overflow-y-auto p-2">
+            {a.map((i, idx) => (
+              <Icon
+                name={"Personal Projects"}
+                disabled={true}
+                iconSelections={TEXT_EDIT_ICON}
+                onClick={() => console.log("dwadak")}
+                onDoubleClick={() => console.log("Double Clicked")}
+                selected={false}
+                key={idx + "icon-2"}
+                position={{ x: 0, y: 0 }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </Draggable>
+  );
+}

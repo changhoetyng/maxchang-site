@@ -27,8 +27,13 @@
     top: 0%; /* Adjust the position as needed */
     left: 1%;
     transform: translateX(-0%);
-    color: white;
-    font-size: 24px; /* Adjust the font size as needed */
-    font-weight: bold;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Optional: adds a shadow for better readability */
+  }
+
+  .draggable-window {
+    width: 50%;
+    height: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
   }

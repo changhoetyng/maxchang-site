@@ -5,10 +5,12 @@ import "@/globals.css";
 export default function Desktop({
   width,
   element,
+  window,
   onClick,
 }: Readonly<{
   width: string;
   element: React.ReactNode[];
+  window: React.ReactNode[];
   onClick?: () => void;
 }>) {
   useEffect(() => {
@@ -35,6 +37,7 @@ export default function Desktop({
             <div key={index + "desktop-el"}>{el}</div>
           ))}
         </div>
+        <div>{window.map((el, index) => el)}</div>
       </div>
     </div>
   );

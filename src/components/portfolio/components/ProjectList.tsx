@@ -2,6 +2,7 @@ import { useState } from "react";
 import Desktop from "./os/Desktop";
 import Icon from "./os/Icons/Icon";
 import { FOLDER_ICON } from "./os/Icons/IconOptions";
+import WindowComponent from "./os/WindowComponent";
 
 export default function ProjectList() {
   function onClickDesktop() {
@@ -39,7 +40,12 @@ export default function ProjectList() {
       <div className="text-white mb-5">
         <h1 className="text-2xl">Projects</h1>
       </div>
-      <Desktop width={"70%"} element={iconElement} onClick={onClickDesktop} />
+      <Desktop
+        width={"70%"}
+        element={iconElement}
+        onClick={onClickDesktop}
+        window={[<WindowComponent />]}
+      />
     </div>
   );
 }

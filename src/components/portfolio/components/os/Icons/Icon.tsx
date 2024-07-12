@@ -10,6 +10,7 @@ export default function Icon({
   selected,
   onDoubleClick,
   position,
+  disabled,
 }: Readonly<{
   name: string;
   className?: string;
@@ -18,6 +19,7 @@ export default function Icon({
   onDoubleClick?: () => void;
   selected: boolean;
   position?: { x: number; y: number };
+  disabled?: boolean;
 }>) {
   function clickHandler() {
     if (onClick) {
@@ -26,7 +28,7 @@ export default function Icon({
   }
 
   return (
-    <Draggable position={position}>
+    <Draggable position={position} disabled={disabled}>
       <button
         onMouseDownCapture={() => clickHandler()}
         onDoubleClick={() => (onDoubleClick ? onDoubleClick() : "")}
@@ -41,13 +43,16 @@ export default function Icon({
           alt={iconSelections}
           className={clsx(
             "no-select",
-            selected ? "border-2 border-gray-500" : ""
+            selected
+              ? "border-2 border-gray-500"
+              : "border-2 border-transparent"
           )}
         />
         <div className="text-container">
           <p
             className={clsx("mt-1 text-content text-xs", {
               "bg-blue-600": selected,
+              "bg-transparent": !selected,
             })}
           >
             {name}
