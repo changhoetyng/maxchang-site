@@ -38,12 +38,25 @@ export default function ProjectList() {
     />,
   ];
 
+  const iconInSchoolProjects = [
+    <Icon
+      name={"School Projects"}
+      disabled={true}
+      iconSelections={TEXT_EDIT_ICON}
+      onClick={() => onSelectFolderPersonalProjects(0)}
+      onDoubleClick={() => console.log("Double Clicked")}
+      selected={selectedPersonalProjects[1]}
+      key={"personal-icon-1"}
+      position={{ x: 0, y: 0 }}
+    />,
+  ];
+
   const iconElement = [
     <Icon
       name={"Academic Projects"}
       iconSelections={FOLDER_ICON}
       onClick={() => onSelectFolder(0)}
-      onDoubleClick={() => console.log("Double Clicked")}
+      onDoubleClick={() => setSelectedWindow(PROJECTS_SELECTION[0])}
       selected={selectedFolder[0]}
       key={"icon-1"}
       position={{ x: 0, y: 0 }}
@@ -52,12 +65,21 @@ export default function ProjectList() {
       name={"Personal Projects"}
       iconSelections={FOLDER_ICON}
       onClick={() => onSelectFolder(1)}
-      onDoubleClick={() => console.log("Double Clicked")}
+      onDoubleClick={() => setSelectedWindow(PROJECTS_SELECTION[1])}
       selected={selectedFolder[1]}
       key={"icon-2"}
       position={{ x: 0, y: 0 }}
     />,
   ];
+
+  const personalProjects = <WindowComponent folder={iconInPersonalProjects} />;
+  const schoolProjects = <WindowComponent folder={iconInSchoolProjects} />;
+
+  const PROJECTS_SELECTION = [
+    { name: "Academic Projects", folder: schoolProjects },
+    { name: "Personal Projects", folder: personalProjects },
+  ];
+  const [selectedWindow, setSelectedWindow] = useState(PROJECTS_SELECTION[0]);
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
@@ -68,7 +90,7 @@ export default function ProjectList() {
         width={"70%"}
         element={iconElement}
         onClick={onClickDesktop}
-        window={[<WindowComponent children={iconInPersonalProjects} />]}
+        window={selectedWindow.folder}
       />
     </div>
   );

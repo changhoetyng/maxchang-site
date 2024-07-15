@@ -10,7 +10,7 @@ export default function Desktop({
 }: Readonly<{
   width: string;
   element: React.ReactNode[];
-  window: React.ReactNode[];
+  window: React.ReactNode;
   onClick?: () => void;
 }>) {
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function Desktop({
             <div key={index + "desktop-el"}>{el}</div>
           ))}
         </div>
-        <div>{window.map((el, index) => el)}</div>
+        <div>{window}</div>
       </div>
     </div>
   );
