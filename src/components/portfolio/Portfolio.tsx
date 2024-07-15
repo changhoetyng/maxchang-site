@@ -4,6 +4,7 @@ import Introduction from "./components/Introduction";
 import MainTerminal from "./components/MainTerminal";
 import MainPowerpoint from "./components/MainPowerpoint";
 import ProjectList from "./components/ProjectList";
+import { Expertise } from "./components/Expertise";
 
 export default function Portfolio() {
   const HEADER_HEIGHT = 64;
@@ -13,7 +14,7 @@ export default function Portfolio() {
       <PortfolioBody>
         <div>
           <Parallax
-            pages={3}
+            pages={4}
             style={{
               minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
               maxHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
@@ -70,6 +71,16 @@ export default function Portfolio() {
             </ParallaxLayer>
             <ParallaxLayer
               offset={2}
+              speed={0.5}
+              style={{
+                ...alignCenter,
+                justifyContent: "center",
+              }}
+            >
+              <Expertise />
+            </ParallaxLayer>
+            <ParallaxLayer
+              offset={3}
               speed={0.5}
               style={{
                 ...alignCenter,
