@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import "./Desktop.css";
-import "@/globals.css";
 
 export default function Desktop({
   width,

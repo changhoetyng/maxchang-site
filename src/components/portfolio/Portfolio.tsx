@@ -6,10 +6,16 @@ import MainPowerpoint from "./components/MainPowerpoint";
 import ProjectList from "./components/ProjectList";
 import { Expertise } from "./components/Expertise";
 import Explore from "./components/Explore";
+import { useState } from "react";
+import "@/globals.css";
+
+const TERMINAL_SELECTED = "terminal";
+const POWERPOINT_SELECTED = "powerpoint";
 
 export default function Portfolio() {
   const HEADER_HEIGHT = 64;
   const alignCenter = { display: "flex", alignItems: "center" };
+  const [activeWindow, setActiveWindow] = useState(TERMINAL_SELECTED);
   return (
     <div>
       <PortfolioBody>
@@ -46,7 +52,10 @@ export default function Portfolio() {
                 justifyContent: "flex-end",
               }}
             >
-              <MainTerminal isTerminalActive={false} />
+              <MainTerminal
+                onFocused={() => setActiveWindow(TERMINAL_SELECTED)}
+                isTerminalActive={activeWindow == TERMINAL_SELECTED}
+              />
             </ParallaxLayer>
             <ParallaxLayer
               offset={1}
@@ -68,7 +77,10 @@ export default function Portfolio() {
                 justifyContent: "flex-end",
               }}
             >
-              <MainPowerpoint isPowerpointActive={true} />
+              <MainPowerpoint
+                onFocused={() => setActiveWindow(POWERPOINT_SELECTED)}
+                isPowerpointActive={activeWindow == POWERPOINT_SELECTED}
+              />
             </ParallaxLayer>
             <ParallaxLayer
               offset={2}

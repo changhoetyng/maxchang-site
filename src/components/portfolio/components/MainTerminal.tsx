@@ -10,10 +10,12 @@ import {
   type TerminalSelectData,
   type TerminalTableData,
 } from "@/types/terminal";
+import clsx from "clsx";
 
 export default function MainTerminal({
   isTerminalActive,
-}: Readonly<{ isTerminalActive: boolean }>) {
+  onFocused,
+}: Readonly<{ isTerminalActive: boolean; onFocused: () => void }>) {
   const [terminalContents, setTerminalContents] = useState<
     (string | TerminalTableData)[]
   >(["Welcome to My Portfolio! - I’m a Software Engineer"]);
@@ -54,16 +56,18 @@ export default function MainTerminal({
 
   useEffect(() => {
     function handleKeypress(e: KeyboardEvent) {
-      e.preventDefault();
       if (e.key === "Enter") {
+        e.preventDefault();
         onEnterTerminal();
       } else if (e.key === "Backspace") {
+        e.preventDefault();
         if (typeof activeCommands === "string") {
           setActiveCommands((prevContent) =>
             (prevContent as string).slice(0, -1)
           );
         }
       } else if (e.key.length === 1) {
+        e.preventDefault();
         if (typeof activeCommands === "string") {
           setActiveCommands((prevContent) => (prevContent as string) + e.key);
         }
@@ -88,7 +92,13 @@ export default function MainTerminal({
   }, [terminalContents]);
 
   return (
-    <div className="w-3/6 h-80 mr-14 max-w-5xl border-green-500 border">
+    <div
+      className={clsx(
+        "w-3/6 h-80 mr-14 max-w-5xl border",
+        isTerminalActive ? "border-green-500" : "border-transparent"
+      )}
+      onClick={onFocused}
+    >
       <BoxTerminal ref={terminalRef}>
         {contentTypes.map((content, idx) =>
           renderContent(

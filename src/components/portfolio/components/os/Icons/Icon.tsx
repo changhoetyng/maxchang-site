@@ -1,5 +1,4 @@
 import Draggable from "react-draggable";
-import "@/globals.css";
 import clsx from "clsx";
 
 export default function Icon({
