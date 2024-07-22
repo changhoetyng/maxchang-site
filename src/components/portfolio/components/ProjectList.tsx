@@ -56,7 +56,10 @@ export default function ProjectList() {
       name={"Academic Projects"}
       iconSelections={FOLDER_ICON}
       onClick={() => onSelectFolder(0)}
-      onDoubleClick={() => setSelectedWindow(PROJECTS_SELECTION[0])}
+      onDoubleClick={() => {
+        setSelectedWindow(PROJECTS_SELECTION[0]);
+        setKey(key + 1);
+      }}
       selected={selectedFolder[0]}
       key={"icon-1"}
       position={{ x: 0, y: 0 }}
@@ -65,23 +68,28 @@ export default function ProjectList() {
       name={"Personal Projects"}
       iconSelections={FOLDER_ICON}
       onClick={() => onSelectFolder(1)}
-      onDoubleClick={() => setSelectedWindow(PROJECTS_SELECTION[1])}
+      onDoubleClick={() => {
+        setSelectedWindow(PROJECTS_SELECTION[1]);
+        setKey(key + 1);
+      }}
       selected={selectedFolder[1]}
       key={"icon-2"}
       position={{ x: 0, y: 0 }}
     />,
   ];
-
+  const [key, setKey] = useState(0);
   const personalProjects = (
     <WindowComponent
       folder={iconInPersonalProjects}
       onClickClose={() => setSelectedWindow(PROJECTS_SELECTION[2])}
+      key={key}
     />
   );
   const schoolProjects = (
     <WindowComponent
       folder={iconInSchoolProjects}
       onClickClose={() => setSelectedWindow(PROJECTS_SELECTION[2])}
+      key={key}
     />
   );
 
