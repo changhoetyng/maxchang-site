@@ -72,12 +72,23 @@ export default function ProjectList() {
     />,
   ];
 
-  const personalProjects = <WindowComponent folder={iconInPersonalProjects} />;
-  const schoolProjects = <WindowComponent folder={iconInSchoolProjects} />;
+  const personalProjects = (
+    <WindowComponent
+      folder={iconInPersonalProjects}
+      onClickClose={() => setSelectedWindow(PROJECTS_SELECTION[2])}
+    />
+  );
+  const schoolProjects = (
+    <WindowComponent
+      folder={iconInSchoolProjects}
+      onClickClose={() => setSelectedWindow(PROJECTS_SELECTION[2])}
+    />
+  );
 
   const PROJECTS_SELECTION = [
     { name: "Academic Projects", folder: schoolProjects },
     { name: "Personal Projects", folder: personalProjects },
+    { name: "None", folder: <></> },
   ];
   const [selectedWindow, setSelectedWindow] = useState(PROJECTS_SELECTION[0]);
 

@@ -3,11 +3,14 @@ import WindowHeader from "./WindowHeader";
 
 export default function Window({
   folder,
-}: Readonly<{ folder: React.ReactNode[] }>) {
+  onClickClose,
+}: Readonly<{ folder: React.ReactNode[]; onClickClose?: () => void }>) {
   return (
     <Draggable positionOffset={{ x: "50%", y: "50%" }}>
       <div className="draggable-window">
-        <WindowHeader onClickClose={() => console.log("close")} />
+        <WindowHeader
+          onClickClose={() => (onClickClose ? onClickClose() : null)}
+        />
         <div
           className="flex flex-row bg-gray-500 relative"
           style={{ height: "calc(100% - 28px)" }}
