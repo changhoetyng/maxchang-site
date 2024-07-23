@@ -10,7 +10,7 @@ export default function RoundedCard({
   const dimensions = useWindowDimensions();
   return (
     <div
-      className="rounded-3xl bg-gray-700 overflow-y-auto text-white p-7"
+      className="rounded-3xl bg-gray-700 text-white p-7"
       style={{
         width: dimensions.width * 0.3,
         height: dimensions.width * 0.3,
@@ -20,11 +20,13 @@ export default function RoundedCard({
         maxHeight: 400,
       }}
     >
-      <div className="flex flex-row items-center">
-        <h1 className="font-extrabold text-2xl">{title}</h1>
-      </div>
-      <div className="mt-3">
-        <h1 className="text-lg font-semibold">{text}</h1>
+      <div className="overflow-y-auto h-full">
+        <div className="flex flex-row items-center">
+          <h1 className="font-extrabold text-2xl">{title}</h1>
+        </div>
+        <div className="mt-3">
+          <h1 className="text-lg font-light">{text}</h1>
+        </div>
       </div>
     </div>
   );
