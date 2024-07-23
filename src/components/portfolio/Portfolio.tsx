@@ -15,7 +15,7 @@ const POWERPOINT_SELECTED = "powerpoint";
 export default function Portfolio() {
   const HEADER_HEIGHT = 64;
   const alignCenter = { display: "flex", alignItems: "center" };
-  const [activeWindow, setActiveWindow] = useState(TERMINAL_SELECTED);
+  const [activeWindow, setActiveWindow] = useState(null);
   return (
     <div>
       <PortfolioBody>

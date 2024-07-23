@@ -18,8 +18,12 @@ export default function MainTerminal({
 }: Readonly<{ isTerminalActive: boolean; onFocused: () => void }>) {
   const [terminalContents, setTerminalContents] = useState<
     (string | TerminalTableData)[]
-  >(["Welcome to My Portfolio! - I’m a Software Engineer"]);
+  >([
+    "Welcome to My Portfolio! - I’m a Software Engineer",
+    "Click on this terminal and type 'help' for a list of commands..",
+  ]);
   const [contentTypes, setContentTypes] = useState<ContentTypes[]>([
+    ContentTypes.TEXT,
     ContentTypes.TEXT,
   ]);
 

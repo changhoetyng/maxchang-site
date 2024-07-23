@@ -39,6 +39,10 @@ export default function SelectTerminal({
       if (e.key === "Enter") {
         console.log(data[activeSelection].value);
         onEnter(data[activeSelection].value);
+      } else if (e.key === "Escape") {
+        if (isActive) {
+          onEnter("");
+        }
       } else if (e.key === "ArrowUp") {
         console.log(e.key);
         arrowUp();
