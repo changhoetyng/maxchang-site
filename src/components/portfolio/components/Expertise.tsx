@@ -4,16 +4,18 @@ export function Expertise() {
   const expertise = [
     {
       title: "Software Development",
-      text: "I'm experienced in developing full-stack applications. I'm experienced with React, Vue on the front-end, and Flask and Express on the back-end.",
+      text: `Experienced in developing full-stack applications with JavaScript frameworks such as Vue.js, React 
+      and Python Framework such as Flask. My skills include building user interfaces, creating API endpoints, and integrating APIs. Furthermore, I’m also experienced in writing test cases with Cypress.`,
     },
     {
       title: "DevOps Engineering",
-      text: `Experienced in designing scalable systems, automating software deployment pipelines, and managing configurations.
-       Proficient in Google Cloud Platform (GCP), Terraform, Shell scripting, and GitHub Actions.`,
+      text: `Skilled in designing scalable systems, automating software deployment pipelines, and managing configurations for application deployment. 
+      Proficient in Google Cloud Platform (GCP), Terraform, Shell scripting, and GitHub Actions.`,
     },
     {
       title: "Database Management",
-      text: `My experience includes cleaning and making sure the data is fit .`,
+      text: `Experienced in designing database schemas which includes relational database PostgreSQL and analytical database Clickhouse. 
+      Proficient in designing database schemas, optimising query performance and monitoring database to ensure everything is running accordingly.`,
     },
   ];
   return (
