@@ -1,4 +1,5 @@
 ---
+import PostsSelectionCard from "@/components/portfolio/components/card/PostsSelectionCard.astro";
 import BlogSelectionLayout from "@/layouts/BlogSelectionLayout.astro";
 import { getCollection } from "astro:content";
 const blogEntries = await getCollection("blogs");
@@ -11,11 +12,10 @@ const blogEntries = await getCollection("blogs");
       <ul>
         {
           blogEntries.map((blogPostEntry) => (
-            <li>
-              <a href={`/blogs/${blogPostEntry.slug}`}>
-                {blogPostEntry.data.title}
-              </a>
-            </li>
+            <PostsSelectionCard>
+              <slot slot="title">{blogPostEntry.data.title}</slot>
+              <slot slot="Date">{blogPostEntry.data.date}</slot>
+            </PostsSelectionCard>
           ))
         }
       </ul>
