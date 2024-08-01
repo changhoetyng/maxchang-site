@@ -1,8 +1,36 @@
-<div>
-  <a>
+---
+const { slug } = Astro.props;
+---
+
+<div class="mb-10">
+  <a class="title" href={"blogs/" + slug}>
     <slot name="title" />
   </a>
-  <a>
-    <slot name="Date" />
-  </a>
+  <p class="date">
+    <slot name="date" />
+  </p>
+  <p class="description">
+    <slot name="description" />
+  </p>
 </div>
+<style>
+  .title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #f5ccd4;
+  }
+  .title:hover {
+    text-decoration: underline;
+  }
+  .date {
+    margin-top: 15px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #f5ccd4;
+  }
+  .description {
+    margin-top: 20px;
+    font-size: 16px;
+    font-weight: 400;
+  }
+</style>

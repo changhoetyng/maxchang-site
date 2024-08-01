@@ -9,12 +9,13 @@ const blogEntries = await getCollection("blogs");
   <div class="w-full h-full flex flex-col items-center justify-center">
     <div class="w-2/4">
       <h1 class="text-4xl font-semibold">Posts</h1>
-      <ul>
+      <ul class="mt-4">
         {
           blogEntries.map((blogPostEntry) => (
-            <PostsSelectionCard>
+            <PostsSelectionCard slug={blogPostEntry.slug}>
               <slot slot="title">{blogPostEntry.data.title}</slot>
-              <slot slot="Date">{blogPostEntry.data.date}</slot>
+              <slot slot="date">{blogPostEntry.data.date}</slot>
+              <slot slot="description">{blogPostEntry.data.description}</slot>
             </PostsSelectionCard>
           ))
         }
