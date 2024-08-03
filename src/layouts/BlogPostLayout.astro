@@ -3,18 +3,28 @@ const { frontmatter } = Astro.props;
 ---
 
 <div class="w-full flex justify-center">
-  <div class="w-4/6">
+  <div class="w-3/6">
+    <a class="underline" href="/blogs">Go Back</a>
     <h1 class="title">{frontmatter.title}</h1>
     <h2>{frontmatter.date}</h2>
     <hr class="h-px my-5 bg-gray-200 border-0 dark:bg-gray-700" />
     <p>{frontmatter.description}</p>
-    <slot />
+    <content>
+      <slot />
+    </content>
   </div>
 </div>
-<style>
+<style is:global>
   .title {
+    margin-top: 15px;
     font-size: 30px;
     font-weight: 600;
     color: #f5ccd4;
+  }
+  content > h1 {
+    font-size: 2rem; /* 32px */
+    line-height: 2.5rem; /* 40px */
+    color: #f5ccd4;
+    font-weight: 600;
   }
 </style>

@@ -1,11 +1,13 @@
 ---
 import BlogHeaders from "@/components/headers/BlogHeaders.astro";
+import { ViewTransitions } from "astro:transitions";
 ---
 
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <BlogHeaders />
+    <ViewTransitions />
   </head>
   <body>
     <slot />
