@@ -1,0 +1,20 @@
+---
+import clsx from "clsx";
+const { prevLink, nextLink, currentPage, totalPage } = Astro.props;
+---
+
+<div class="flex flex-row">
+  <a
+    href={prevLink}
+    class={clsx("mr-4 underline", {
+      "cursor-not-allowed text-gray-400": currentPage === 1,
+    })}>Prev Page</a
+  >
+  <span>{currentPage} of {totalPage}</span>
+  <a
+    href={nextLink}
+    class={clsx("ml-4 underline", {
+      "cursor-not-allowed text-gray-400": currentPage === totalPage,
+    })}>Next Page</a
+  >
+</div>

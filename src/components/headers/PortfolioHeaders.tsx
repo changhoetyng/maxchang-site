@@ -12,7 +12,7 @@ export default function PortfolioHeaders() {
           Project
         </a>
         <a
-          href="/blogs"
+          href="/blogs/1"
           className="px-6 pt-1 pb-1 bg-gradient-to-br text-white hover:text-main-color hover:from-main-color from-0% hover:via-main-blue via-5% hover:to-main-purple rounded-full to-90% font-bold"
         >
           Blog

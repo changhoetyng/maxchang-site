@@ -1,8 +1,15 @@
 ---
-import PostsSelectionCard from "@/components/portfolio/components/card/PostsSelectionCard.astro";
+import PostsSelectionCard from "@/components/card/PostsSelectionCard.astro";
+import Pagination from "@/components/navigation/Pagination.astro";
 import BlogSelectionLayout from "@/layouts/BlogLayout.astro";
 import { getCollection } from "astro:content";
-const blogEntries = await getCollection("blogs");
+
+export async function getStaticPaths({ paginate }: { paginate: any }) {
+  const blogEntries = await getCollection("blogs");
+  // Generate pages from our array of astronauts, with 2 to a page
+  return paginate(blogEntries, { pageSize: 2 });
+}
+const { page }: any = Astro.props;
 ---
 
 <BlogSelectionLayout>
@@ -11,7 +18,7 @@ const blogEntries = await getCollection("blogs");
       <h1 class="text-4xl font-semibold">Posts</h1>
       <ul class="mt-4">
         {
-          blogEntries.map((blogPostEntry) => (
+          page.data.map((blogPostEntry: any) => (
             <PostsSelectionCard slug={blogPostEntry.slug}>
               <slot slot="title">{blogPostEntry.data.title}</slot>
               <slot slot="date">{blogPostEntry.data.date}</slot>
@@ -21,5 +28,11 @@ const blogEntries = await getCollection("blogs");
         }
       </ul>
     </div>
+    <Pagination
+      currentPage={page.currentPage}
+      totalPage={page.lastPage}
+      nextLink={page.url.next}
+      prevLink={page.url.prev}
+    />
   </div>
 </BlogSelectionLayout>
