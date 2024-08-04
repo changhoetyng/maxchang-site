@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import wallpaper from "/public/wallpaper.jpg";
 import "./Desktop.css";
 
 export default function Desktop({
@@ -27,7 +28,7 @@ export default function Desktop({
     >
       <div className="desktop-background-wrapper">
         <img
-          src={"/public/wallpaper.jpg"}
+          src={wallpaper.src}
           alt="desktop"
           className="desktop-background no-select"
         ></img>
