@@ -10,7 +10,7 @@ export default function Slide({
   return (
     <SlideContent isSidePanel={isSidePanel}>
       <img
-        src={`/pages/${page}.svg`}
+        src={`/public/pages/${page}.svg`}
         className={page + "-slide"}
         alt={page + "-alt"}
       />

@@ -8,5 +8,5 @@ import mdx from "@astrojs/mdx";
 export default defineConfig({
   integrations: [react(), tailwind(), mdx()],
   site: "https://changhoetyng.github.io",
-  base: "maxchang-site",
+  base: "",
 });
