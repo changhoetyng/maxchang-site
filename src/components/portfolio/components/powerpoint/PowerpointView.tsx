@@ -8,6 +8,10 @@ import {
 } from "react-zoom-pan-pinch";
 import Slide from "./Slide";
 import WindowHeader from "@/components/portfolio/components/os/WindowHeader";
+// import Page1 from "/public/pages/page1.svg";
+import page1 from "/public/pages/page1.svg?react";
+import page2 from "/public/pages/page2.svg?react";
+import page3 from "/public/pages/page3.svg?react";
 
 export default function PowerpointView({
   isPowerpointActive,
@@ -19,15 +23,15 @@ export default function PowerpointView({
   const zoomComponent = useRef<ReactZoomPanPinchRef | null>(null);
 
   const SLIDES_SIDE_PANEL = [
-    <Slide key={"1"} isSidePanel={true} page="page1" />,
-    <Slide key={"2"} isSidePanel={true} page="page2" />,
-    <Slide key={"3"} isSidePanel={true} page="page3" />,
+    <Slide key={"1"} isSidePanel={true} page={page1} />,
+    <Slide key={"2"} isSidePanel={true} page={page2} />,
+    <Slide key={"3"} isSidePanel={true} page={page3} />,
   ];
 
   const SLIDES = [
-    <Slide key={"1"} isSidePanel={false} page="page1" />,
-    <Slide key={"2"} isSidePanel={false} page="page2" />,
-    <Slide key={"3"} isSidePanel={false} page="page3" />,
+    <Slide key={"1"} isSidePanel={false} page={page1} />,
+    <Slide key={"2"} isSidePanel={false} page={page2} />,
+    <Slide key={"3"} isSidePanel={false} page={page3} />,
   ];
 
   async function resetSlide() {

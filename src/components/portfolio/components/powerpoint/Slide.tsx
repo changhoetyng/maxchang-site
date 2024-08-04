@@ -1,19 +1,14 @@
 import SlideContent from "./SlideTableContent";
-
 export default function Slide({
   isSidePanel,
   page,
 }: Readonly<{
   isSidePanel: boolean;
-  page: string;
+  page: any;
 }>) {
   return (
     <SlideContent isSidePanel={isSidePanel}>
-      <img
-        src={`/public/pages/${page}.svg`}
-        className={page + "-slide"}
-        alt={page + "-alt"}
-      />
+      <img src={page.src} className={page + "-slide"} alt={page + "-alt"} />
     </SlideContent>
   );
 }
