@@ -27,7 +27,7 @@ export default function Desktop({
     >
       <div className="desktop-background-wrapper">
         <img
-          src={"/wallpaper.jpg"}
+          src={"/public/wallpaper.jpg"}
           alt="desktop"
           className="desktop-background no-select"
         ></img>
