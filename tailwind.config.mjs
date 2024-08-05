@@ -7,6 +7,7 @@ export default {
         "main-purple": "#B8A4C9",
         "main-blue": "#C9DEF4",
         "main-color": "#1E1E1E",
+        "main-pink": "#F5CCD4",
       },
     },
     fontFamily: {

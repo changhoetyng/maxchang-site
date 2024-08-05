@@ -8,7 +8,6 @@ import {
 } from "react-zoom-pan-pinch";
 import Slide from "./Slide";
 import WindowHeader from "@/components/portfolio/components/os/WindowHeader";
-// import Page1 from "/public/pages/page1.svg";
 import page1 from "/public/pages/page1.svg?react";
 import page2 from "/public/pages/page2.svg?react";
 import page3 from "/public/pages/page3.svg?react";

@@ -4,7 +4,7 @@ const { frontmatter } = Astro.props;
 
 <div class="w-full flex justify-center">
   <div class="w-3/6">
-    <a class="underline" href="/blogs">Go Back</a>
+    <button class="underline" onclick="history.back()">Go Back</button>
     <h1 class="title">{frontmatter.title}</h1>
     <h2>{frontmatter.date}</h2>
     <hr class="h-px my-5 bg-gray-200 border-0 dark:bg-gray-700" />

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import Desktop from "./os/Desktop";
 import Icon from "./os/Icons/Icon";
-import { FOLDER_ICON, TEXT_EDIT_ICON } from "./os/Icons/IconOptions";
+import FOLDER_ICON from "public/icons/folder.png";
+import TEXT_EDIT_ICON from "public/icons/TextEdit.png";
 import WindowComponent from "./os/WindowComponent";
 
 export default function ProjectList() {
@@ -29,7 +30,7 @@ export default function ProjectList() {
     <Icon
       name={"Personal Projects"}
       disabled={true}
-      iconSelections={TEXT_EDIT_ICON}
+      iconSelections={TEXT_EDIT_ICON.src}
       onClick={() => onSelectFolderPersonalProjects(0)}
       onDoubleClick={() => console.log("Double Clicked")}
       selected={selectedPersonalProjects[0]}
@@ -42,7 +43,7 @@ export default function ProjectList() {
     <Icon
       name={"School Projects"}
       disabled={true}
-      iconSelections={TEXT_EDIT_ICON}
+      iconSelections={TEXT_EDIT_ICON.src}
       onClick={() => onSelectFolderPersonalProjects(0)}
       onDoubleClick={() => console.log("Double Clicked")}
       selected={selectedPersonalProjects[1]}
@@ -54,7 +55,7 @@ export default function ProjectList() {
   const iconElement = [
     <Icon
       name={"Academic Projects"}
-      iconSelections={FOLDER_ICON}
+      iconSelections={FOLDER_ICON.src}
       onClick={() => onSelectFolder(0)}
       onDoubleClick={() => {
         setSelectedWindow(PROJECTS_SELECTION[0]);
@@ -66,7 +67,7 @@ export default function ProjectList() {
     />,
     <Icon
       name={"Personal Projects"}
-      iconSelections={FOLDER_ICON}
+      iconSelections={FOLDER_ICON.src}
       onClick={() => onSelectFolder(1)}
       onDoubleClick={() => {
         setSelectedWindow(PROJECTS_SELECTION[1]);
