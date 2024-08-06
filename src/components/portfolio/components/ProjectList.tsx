@@ -7,11 +7,13 @@ import WindowComponent from "./os/WindowComponent";
 import Row from "./os/Selectable/Row";
 
 export default function ProjectList() {
+  const [key, setKey] = useState(0);
   function onClickDesktop() {
     setSelectedFolder(selectedFolder.map((_) => false));
   }
   function onSelectFolder(idx: number) {
     setSelectedFolder(selectedFolder.map((_, index) => index === idx));
+    setKey((prev) => prev + 1);
   }
 
   const [selectedFolder, setSelectedFolder] = useState([false, false]);
@@ -21,15 +23,32 @@ export default function ProjectList() {
   }
 
   const iconInPersonalProjects = [
-    <Icon
-      name={"Personal Projects"}
-      disabled={true}
+    <Row
+      name={"TuneShift"}
       iconSelections={TEXT_EDIT_ICON.src}
-      onClick={() => console.log("single clicked")}
-      onDoubleClick={() => console.log("Double Clicked")}
-      selected={true}
+      onClick={() => {
+        onSelectFolderSchoolProjects(0);
+      }}
+      index={0}
       key={"personal-icon-1"}
-      position={{ x: 0, y: 0 }}
+    />,
+    <Row
+      name={"Infix Prefix Postfix Converter"}
+      iconSelections={TEXT_EDIT_ICON.src}
+      onClick={() => {
+        onSelectFolderSchoolProjects(0);
+      }}
+      index={1}
+      key={"personal-icon-2"}
+    />,
+    <Row
+      name={"TollCalc"}
+      iconSelections={TEXT_EDIT_ICON.src}
+      onClick={() => {
+        onSelectFolderSchoolProjects(0);
+      }}
+      index={2}
+      key={"personal-icon-3"}
     />,
   ];
 
@@ -93,12 +112,14 @@ export default function ProjectList() {
     <WindowComponent
       folder={iconInPersonalProjects}
       onClickClose={() => setSelectedWindow(PROJECTS_SELECTION[2])}
+      key={"personal" + key}
     />
   );
   const schoolProjects = (
     <WindowComponent
       folder={iconInSchoolProjects}
       onClickClose={() => setSelectedWindow(PROJECTS_SELECTION[2])}
+      key={"school" + key}
     />
   );
 
