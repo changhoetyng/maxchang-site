@@ -18,16 +18,12 @@ export default function ProjectList() {
 
   const [selectedFolder, setSelectedFolder] = useState([false, false]);
 
-  function onSelectFolderSchoolProjects(idx: number) {
-    console.log("School Link");
-  }
-
   const iconInPersonalProjects = [
     <Row
       name={"TuneShift"}
       iconSelections={TEXT_EDIT_ICON.src}
       onClick={() => {
-        onSelectFolderSchoolProjects(0);
+        window.open("https://github.com/changhoetyng/tuneshift");
       }}
       index={0}
       key={"personal-icon-1"}
@@ -36,7 +32,7 @@ export default function ProjectList() {
       name={"Infix Prefix Postfix Converter"}
       iconSelections={TEXT_EDIT_ICON.src}
       onClick={() => {
-        onSelectFolderSchoolProjects(0);
+        window.open("https://github.com/changhoetyng/ippVisualizer");
       }}
       index={1}
       key={"personal-icon-2"}
@@ -45,7 +41,7 @@ export default function ProjectList() {
       name={"TollCalc"}
       iconSelections={TEXT_EDIT_ICON.src}
       onClick={() => {
-        onSelectFolderSchoolProjects(0);
+        window.open("https://github.com/changhoetyng/tollCalc");
       }}
       index={2}
       key={"personal-icon-3"}
@@ -54,10 +50,12 @@ export default function ProjectList() {
 
   const iconInSchoolProjects = [
     <Row
-      name={"Face Recognition Using Transfer Learning"}
+      name={"Face Recognition System Using Siamese Network"}
       iconSelections={TEXT_EDIT_ICON.src}
       onClick={() => {
-        onSelectFolderSchoolProjects(0);
+        window.open(
+          "https://drive.google.com/file/d/1sQBiSu0G3logKLPiXGDN1-4br2-1OfnL/view?usp=sharing"
+        );
       }}
       index={0}
       key={"school-icon-1"}
@@ -66,18 +64,22 @@ export default function ProjectList() {
       name={"University Utilities Booking Mobile App"}
       iconSelections={TEXT_EDIT_ICON.src}
       onClick={() => {
-        onSelectFolderSchoolProjects(1);
+        window.open(
+          "https://github.com/changhoetyng/University-Utilities-Booking-Mobile-App"
+        );
       }}
       index={1}
       key={"school-icon-2"}
     />,
     <Row
       name={
-        "A Study in Reinforcement Learning with Deep Q-Network and Double Deep Q-Network on Low-Dimensional State Space"
+        "Reinforcement Learning with Deep Q-Network and Double Deep Q-Network on Low-Dimensional State Space"
       }
       iconSelections={TEXT_EDIT_ICON.src}
       onClick={() => {
-        onSelectFolderSchoolProjects(2);
+        window.open(
+          "https://github.com/changhoetyng/Deep-Q-Network-and-Double-Deep-Q-Network-on-Low-Dimensional-State-Space"
+        );
       }}
       index={2}
       key={"school-icon-3"}

@@ -43,7 +43,7 @@ export default function Row({
       />
       <p
         style={{ fontSize: "0.8rem" }}
-        className={clsx("ml-2 text-white truncate hover:text-wrap")}
+        className={clsx("ml-2 text-white truncate hover:text-nowrap")}
       >
         {name}
       </p>
