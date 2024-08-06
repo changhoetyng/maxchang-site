@@ -1,9 +1,10 @@
 import { useState } from "react";
 import Desktop from "./os/Desktop";
-import Icon from "./os/Icons/Icon";
+import Icon from "./os/Selectable/Icon";
 import FOLDER_ICON from "public/icons/folder.png";
 import TEXT_EDIT_ICON from "public/icons/TextEdit.png";
 import WindowComponent from "./os/WindowComponent";
+import Row from "./os/Selectable/Row";
 
 export default function ProjectList() {
   function onClickDesktop() {
@@ -40,15 +41,34 @@ export default function ProjectList() {
   ];
 
   const iconInSchoolProjects = [
-    <Icon
-      name={"School Projects"}
-      disabled={true}
+    <Row
+      name={"Face Recognition Using Transfer Learning"}
       iconSelections={TEXT_EDIT_ICON.src}
       onClick={() => onSelectFolderPersonalProjects(0)}
       onDoubleClick={() => console.log("Double Clicked")}
       selected={selectedPersonalProjects[1]}
+      index={0}
       key={"personal-icon-1"}
-      position={{ x: 0, y: 0 }}
+    />,
+    <Row
+      name={"University Utilities Booking Mobile App"}
+      iconSelections={TEXT_EDIT_ICON.src}
+      onClick={() => onSelectFolderPersonalProjects(0)}
+      onDoubleClick={() => console.log("Double Clicked")}
+      selected={selectedPersonalProjects[1]}
+      index={1}
+      key={"personal-icon-1"}
+    />,
+    <Row
+      name={
+        "A Study in Reinforcement Learning with Deep Q-Network and Double Deep Q-Network on Low-Dimensional State Space"
+      }
+      iconSelections={TEXT_EDIT_ICON.src}
+      onClick={() => onSelectFolderPersonalProjects(0)}
+      onDoubleClick={() => console.log("Double Clicked")}
+      selected={selectedPersonalProjects[1]}
+      index={2}
+      key={"personal-icon-1"}
     />,
   ];
 
@@ -107,7 +127,7 @@ export default function ProjectList() {
         <h1 className="text-2xl">Projects</h1>
       </div>
       <Desktop
-        width={"70%"}
+        width={"80%"}
         element={iconElement}
         onClick={onClickDesktop}
         window={selectedWindow.folder}
