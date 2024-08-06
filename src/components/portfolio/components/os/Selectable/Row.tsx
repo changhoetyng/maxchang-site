@@ -5,7 +5,6 @@ export default function Row({
   className,
   iconSelections,
   onClick,
-  selected,
   onDoubleClick,
   index,
 }: Readonly<{
@@ -14,7 +13,6 @@ export default function Row({
   iconSelections: string;
   onClick?: () => void;
   onDoubleClick?: () => void;
-  selected: boolean;
   index: number;
 }>) {
   function clickHandler() {
@@ -29,10 +27,10 @@ export default function Row({
       onDoubleClick={() => (onDoubleClick ? onDoubleClick() : "")}
       className={clsx(
         className,
-        "outline-none flex flex-row items-center w-full",
+        "outline-none flex flex-row items-center w-full h-6 pl-2 pr-2 rounded",
         {
-          "bg-gray-500": index % 2 === 0,
-          "bg-gray-600": index % 2 === 1,
+          "bg-gray-600": index % 2 === 0,
+          "bg-gray-700": index % 2 === 1,
         }
       )}
     >
@@ -41,19 +39,11 @@ export default function Row({
         draggable="false"
         alt={iconSelections}
         style={{ width: "1rem" }}
-        className={clsx(
-          "no-select",
-          selected
-            ? "border bg-gray-600 border-gray-400"
-            : "border border-transparent"
-        )}
+        className={clsx("no-select", "border border-transparent")}
       />
       <p
         style={{ fontSize: "0.8rem" }}
-        className={clsx("ml-2 text-white truncate hover:text-wrap", {
-          "bg-blue-600": selected,
-          "bg-transparent": !selected,
-        })}
+        className={clsx("ml-2 text-white truncate hover:text-wrap")}
       >
         {name}
       </p>
