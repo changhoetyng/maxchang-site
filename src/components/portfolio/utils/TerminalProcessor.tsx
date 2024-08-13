@@ -25,6 +25,43 @@ const PROJECTS_OPTIONS: TerminalTableData = {
       "A migration tool to transfer playlists between Spotify and Apple Music.",
       ["link", "Link", "https://github.com/changhoetyng/tuneshift"],
     ],
+    [
+      "Infix Prefix Postfix Converter",
+      "Visualizer for converting infix expressions to prefix and postfix expressions.",
+      ["link", "Link", "https://github.com/changhoetyng/tuneshift"],
+    ],
+    [
+      "TollCalc",
+      "A toll calculator for Malaysian highways.",
+      ["link", "Link", "https://github.com/changhoetyng/tollCalc"],
+    ],
+    [
+      "Face Recognition System Using Siamese Network",
+      "A face recognition system using siamese network.",
+      [
+        "link",
+        "Link",
+        "https://drive.google.com/file/d/1sQBiSu0G3logKLPiXGDN1-4br2-1OfnL/view?usp=sharing",
+      ],
+    ],
+    [
+      "University Utilities Booking Mobile App",
+      "A mobile app for booking university utilities.",
+      [
+        "link",
+        "Link",
+        "https://github.com/changhoetyng/University-Utilities-Booking-Mobile-App",
+      ],
+    ],
+    [
+      "Reinforcement Learning with Deep Q-Network and Double Deep Q-Network on Low-Dimensional State Space",
+      "Explores reinforcement learning techniques using DQN and DDQN on a specific low-dimensional state space problem.",
+      [
+        "link",
+        "Link",
+        "https://github.com/changhoetyng/Deep-Q-Network-and-Double-Deep-Q-Network-on-Low-Dimensional-State-Space",
+      ],
+    ],
   ],
 };
 
