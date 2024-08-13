@@ -3,15 +3,7 @@
     height: 4px; /* Change the height here */
 }
 
-::-webkit-scrollbar-track {
-    background: #f1f1f1; /* Background color of the scrollbar track */
-}
-
 ::-webkit-scrollbar-thumb {
-    background: #888; /* Color of the scrollbar thumb */
-    border-radius: 4px; /* Rounding the scrollbar thumb corners */
-}
-
-::-webkit-scrollbar-thumb:hover {
     background: #555; /* Color when hovering over the scrollbar thumb */
+    border-radius: 4px; /* Rounding the scrollbar thumb corners */
 }

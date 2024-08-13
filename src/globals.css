@@ -16,6 +16,10 @@
     user-select: none; /* Non-prefixed version, currently supported by Chrome, Opera, and Firefox */
 }
 
+:focus {
+    outline: none;
+}
+
 .text-content {
     display: inline-block;
     padding: 0.25rem; /* Adjust padding as needed */

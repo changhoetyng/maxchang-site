@@ -7,13 +7,13 @@ export default function Explore() {
       <h1 style={{ fontSize: "40px" }} className="font-semibold mt-3">
         Explore
       </h1>
-      <a
+      {/* <a
         className="mt-5 w-fit underline hover:text-main-pink"
         style={{ fontSize: "25px" }}
         href="/blogs/1"
       >
         Blog
-      </a>
+      </a> */}
       <a
         href="https://drive.google.com/file/d/1p14TXTrO4ckIDP4We292-3CDC2tpv-0N/view?usp=drive_link"
         target="_blank"
