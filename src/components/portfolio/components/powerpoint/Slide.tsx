@@ -1,4 +1,5 @@
 import SlideContent from "./SlideTableContent";
+import "./Slide.css";
 export default function Slide({
   isSidePanel,
   Page,
