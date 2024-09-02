@@ -10,7 +10,7 @@ export default function PortfolioHeaders() {
           Blog
         </a> */}
         <a
-          href="https://drive.google.com/file/d/1p14TXTrO4ckIDP4We292-3CDC2tpv-0N/view?usp=drive_link"
+          href="https://drive.google.com/file/d/1DVMEpZpc6aT78eUx-YkEmluKQuFIfeJ5/view?usp=sharing"
           className="px-6 pt-1 pb-1 bg-gradient-to-br text-white hover:text-main-color hover:from-main-color from-0% hover:via-main-blue via-5% hover:to-main-purple rounded-full to-90% font-bold"
           target="_blank"
         >

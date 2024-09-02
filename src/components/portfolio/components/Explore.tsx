@@ -15,7 +15,7 @@ export default function Explore() {
         Blog
       </a> */}
       <a
-        href="https://drive.google.com/file/d/1p14TXTrO4ckIDP4We292-3CDC2tpv-0N/view?usp=drive_link"
+        href="https://drive.google.com/file/d/1DVMEpZpc6aT78eUx-YkEmluKQuFIfeJ5/view?usp=sharing"
         target="_blank"
         className="w-fit mt-4 underline hover:text-main-pink"
         style={{ fontSize: "25px" }}
