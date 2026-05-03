@@ -83,6 +83,21 @@ const { frontmatter } = Astro.props;
     );
 
     headings.forEach((h) => observer.observe(h));
+
+    // Activate last heading when scrolled to the bottom
+    window.addEventListener("scroll", () => {
+      if (pauseObserver) return;
+      const nearBottom =
+        window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 8;
+      if (nearBottom) {
+        const lastHeading = headings[headings.length - 1];
+        if (lastHeading) {
+          activeId = lastHeading.id;
+          links.forEach((l) => l.classList.remove("active"));
+          nav.querySelector<HTMLElement>(`a[href="#${activeId}"]`)?.classList.add("active");
+        }
+      }
+    }, { passive: true });
   }
 
   // ── Code block filename labels ────────────────────────
