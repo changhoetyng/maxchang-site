@@ -8,6 +8,11 @@ import mdx from "@astrojs/mdx";
 export default defineConfig({
   integrations: [react(), mdx()],
   site: "https://maxchang.xyz",
+  markdown: {
+    shikiConfig: {
+      theme: "ayu-dark",
+    },
+  },
   vite: {
     plugins: [tailwindcss(), svgr({ include: "**/*.svg?react" })],
   },

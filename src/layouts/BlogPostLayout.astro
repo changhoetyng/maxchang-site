@@ -2,29 +2,391 @@
 const { frontmatter } = Astro.props;
 ---
 
-<div class="w-full flex justify-center">
-  <div class="w-3/6">
-    <button class="underline" onclick="history.back()">Go Back</button>
-    <h1 class="title">{frontmatter.title}</h1>
-    <h2>{frontmatter.date}</h2>
-    <hr class="h-px my-5 bg-gray-200 border-0 dark:bg-gray-700" />
-    <p>{frontmatter.description}</p>
-    <content>
+<div class="page-layout">
+  <!-- Main content -->
+  <article class="content-col">
+    <button class="go-back" onclick="history.back()">← back</button>
+
+    <header class="post-header">
+      <h1 class="post-title">{frontmatter.title}</h1>
+      <div class="post-meta">
+        <span>{frontmatter.date}</span>
+        {frontmatter.author && <span>/ {frontmatter.author}</span>}
+      </div>
+      <div class="neon-rule"></div>
+    </header>
+
+    <div class="post-body" id="post-body">
       <slot />
-    </content>
-  </div>
+    </div>
+  </article>
+
+  <!-- TOC sidebar -->
+  <aside class="toc-col" id="toc-sidebar">
+    <p class="toc-header">On this page</p>
+    <nav id="toc-nav"></nav>
+  </aside>
 </div>
-<style is:global>
-  .title {
-    margin-top: 15px;
-    font-size: 30px;
-    font-weight: 600;
-    color: #f5ccd4;
+
+<script>
+  // ── TOC ──────────────────────────────────────────────
+  const body = document.getElementById("post-body");
+  const nav = document.getElementById("toc-nav");
+
+  if (body && nav) {
+    const headings = body.querySelectorAll("h1, h2, h3");
+
+    headings.forEach((h, i) => {
+      if (!h.id) {
+        h.id =
+          h.textContent
+            ?.toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/(^-|-$)/g, "") ?? `heading-${i}`;
+      }
+      const a = document.createElement("a");
+      a.href = `#${h.id}`;
+      a.textContent = h.textContent ?? "";
+      a.className = `toc-link toc-${h.tagName.toLowerCase()}`;
+      nav.appendChild(a);
+    });
+
+    const links = nav.querySelectorAll<HTMLElement>(".toc-link");
+
+    // When a TOC link is clicked, set it active immediately and pause
+    // the observer briefly so the scroll animation doesn't fight it.
+    let pauseObserver = false;
+    links.forEach((link) => {
+      link.addEventListener("click", () => {
+        links.forEach((l) => l.classList.remove("active"));
+        link.classList.add("active");
+        pauseObserver = true;
+        setTimeout(() => (pauseObserver = false), 1000);
+      });
+    });
+
+    // Scroll spy — tracks which heading is in view
+    let activeId = "";
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (pauseObserver) return;
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            activeId = entry.target.id;
+          }
+        });
+        links.forEach((l) => l.classList.remove("active"));
+        const active = nav.querySelector<HTMLElement>(`a[href="#${activeId}"]`);
+        active?.classList.add("active");
+      },
+      { rootMargin: "-10% 0% -80% 0%", threshold: 0 }
+    );
+
+    headings.forEach((h) => observer.observe(h));
   }
-  content > h1 {
-    font-size: 2rem; /* 32px */
-    line-height: 2.5rem; /* 40px */
+
+  // ── Code block filename labels ────────────────────────
+  const ext: Record<string, string> = {
+    typescript: "ts", javascript: "js", python: "py",
+    css: "css", html: "html", bash: "sh", shell: "sh",
+    json: "json", yaml: "yml", rust: "rs", go: "go",
+    sql: "sql", mdx: "mdx", markdown: "md",
+  };
+
+  // ── Copy buttons ──────────────────────────────────────
+  document.querySelectorAll<HTMLElement>("pre.astro-code[data-language]").forEach((pre) => {
+    const lang = pre.getAttribute("data-language") ?? "";
+    pre.setAttribute("data-filename", `index.${ext[lang] ?? lang}`);
+
+    const btn = document.createElement("button");
+    btn.className = "copy-btn";
+    btn.textContent = "copy";
+    btn.setAttribute("aria-label", "Copy code");
+
+    btn.addEventListener("click", async () => {
+      const code = pre.querySelector("code")?.textContent ?? "";
+      try {
+        await navigator.clipboard.writeText(code);
+      } catch {
+        // Fallback for older browsers / non-HTTPS
+        const ta = document.createElement("textarea");
+        ta.value = code;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      btn.textContent = "copied!";
+      btn.classList.add("copy-btn--done");
+      setTimeout(() => {
+        btn.textContent = "copy";
+        btn.classList.remove("copy-btn--done");
+      }, 2000);
+    });
+
+    pre.appendChild(btn);
+  });
+</script>
+
+<style is:global>
+  /* ── Page grid ── */
+  .page-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 3.5rem;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 6rem;
+    align-items: start;
+  }
+
+  @media (max-width: 860px) {
+    .page-layout { grid-template-columns: 1fr; }
+    .toc-col { display: none; }
+  }
+
+  /* ── Back button ── */
+  .go-back {
+    font-family: "Andale Mono", monospace;
+    font-size: 12px;
+    color: #e6b450;
+    opacity: 0.5;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 1.75rem;
+    display: block;
+    transition: opacity 0.15s;
+    letter-spacing: 0.04em;
+  }
+  .go-back:hover { opacity: 1; }
+
+  /* ── Post header ── */
+  .post-title {
+    font-size: 2rem;
+    font-weight: 700;
     color: #f5ccd4;
-    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+  }
+
+  .post-meta {
+    font-family: "Andale Mono", monospace;
+    font-size: 11px;
+    color: #3a3a4a;
+    letter-spacing: 0.08em;
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .neon-rule {
+    height: 1px;
+    background: linear-gradient(to right, #e6b450 0%, #bf5fff 45%, transparent 100%);
+    box-shadow: 0 0 10px rgba(230, 180, 80, 0.5), 0 0 20px rgba(191, 95, 255, 0.2);
+    margin-bottom: 2.5rem;
+  }
+
+  /* ── TOC sidebar ── */
+  .toc-col {
+    position: sticky;
+    top: 2rem;
+  }
+
+  .toc-header {
+    font-family: "Andale Mono", monospace;
+    font-size: 10px;
+    color: #3a3a4a;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  #toc-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .toc-link {
+    font-family: "Andale Mono", monospace;
+    font-size: 12px;
+    color: #505070;
+    text-decoration: none;
+    padding: 3px 0 3px 10px;
+    border-left: 1px solid #1a1f29;
+    line-height: 1.4;
+    transition: color 0.15s, border-color 0.15s;
+    display: block;
+  }
+  .toc-link:hover { color: #a0a0c0; }
+  .toc-link.active {
+    color: #e6b450;
+    border-left-color: #e6b450;
+  }
+  .toc-h2 { padding-left: 10px; }
+  .toc-h3 { padding-left: 22px; font-size: 11px; }
+
+  /* ── Body text ── */
+  .post-body p {
+    color: #9a9ab0;
+    font-size: 15.5px;
+    line-height: 1.85;
+    margin-bottom: 1.2rem;
+  }
+  .post-body strong { color: #d0d0e0; }
+  .post-body a { color: #e6b450; text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ── Headings ── */
+  .post-body h1 {
+    font-size: 1.7rem; font-weight: 700;
+    color: #f5ccd4; margin: 2.5rem 0 0.75rem;
+  }
+  .post-body h2 {
+    font-size: 1.2rem; font-weight: 600;
+    color: #e6b450; margin: 2.25rem 0 0.6rem;
+  }
+  .post-body h3 {
+    font-size: 1rem; font-weight: 600;
+    color: #c9def4; margin: 1.75rem 0 0.5rem;
+  }
+
+  /* ── Lists ── */
+  .post-body ul, .post-body ol {
+    color: #9a9ab0;
+    line-height: 1.85;
+    padding-left: 1.4rem;
+    margin-bottom: 1.2rem;
+  }
+  .post-body li { margin-bottom: 0.25rem; }
+  .post-body ul li::marker { color: #e6b450; }
+  .post-body ol li::marker { color: #e6b450; font-family: "Andale Mono", monospace; font-size: 0.85em; }
+
+  /* ── Blockquote ── */
+  .post-body blockquote {
+    border-left: 2px solid #e6b45055;
+    background: rgba(230, 180, 80, 0.03);
+    padding: 0.75rem 1.1rem;
+    margin: 1.75rem 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .post-body blockquote p { color: #555570; font-style: italic; margin: 0; }
+
+  /* ── HR ── */
+  .post-body hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, #e6b45022, #bf5fff22);
+    margin: 2rem 0;
+  }
+
+  /* ── Inline code ── */
+  .post-body :not(pre) > code {
+    background: #0d1017;
+    border: 1px solid #1f2430;
+    border-radius: 3px;
+    padding: 1px 6px;
+    font-family: "Andale Mono", monospace;
+    font-size: 0.85em;
+    color: #e6b450;
+  }
+
+  /* ────────────────────────────────────────
+     Code block — VS Code / Ayu Dark window
+  ─────────────────────────────────────── */
+  pre.astro-code {
+    position: relative;
+    background: #0b0e14 !important;
+    border-radius: 10px;
+    border: 1px solid #1a1f2e;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.02),
+      0 16px 48px rgba(0, 0, 0, 0.6);
+    margin: 1.75rem 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* Header row: filename tab */
+  pre.astro-code::before {
+    content: attr(data-filename);
+    display: block;
+    background: #0d1017;
+    color: #e6b450;
+    font-family: "Andale Mono", monospace;
+    font-size: 12px;
+    padding: 8px 14px 0;
+    border-bottom: 1px solid #1a1f2e;
+    /* Underline just the tab text using a box-shadow trick */
+    text-shadow: none;
+    letter-spacing: 0.02em;
+    padding-bottom: 7px;
+    box-shadow: inset 0 -2px 0 #e6b450;
+  }
+
+  /* Status bar */
+  pre.astro-code::after {
+    content: "⊘ 0  △ 0                      " attr(data-language);
+    display: block;
+    background: #0d1017;
+    color: #2a3040;
+    font-family: "Andale Mono", monospace;
+    font-size: 10px;
+    padding: 4px 12px;
+    border-top: 1px solid #1a1f2e;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-align: right;
+  }
+
+  pre.astro-code code {
+    display: block;
+    padding: 1.1rem 1.25rem;
+    overflow-x: auto;
+    font-family: "Andale Mono", monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    background: transparent !important;
+  }
+
+  /* ── Copy button ── */
+  .copy-btn {
+    position: absolute;
+    /* sits in the code area just below the filename header (~34px tall) */
+    top: calc(34px + 0.6rem);
+    right: 0.75rem;
+    font-family: "Andale Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: #505070;
+    background: #0d1017;
+    border: 1px solid #1a1f2e;
+    border-radius: 4px;
+    padding: 3px 8px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, opacity 0.15s;
+    /* desktop: hide until hover */
+    opacity: 0;
+    z-index: 10;
+  }
+  pre.astro-code:hover .copy-btn {
+    opacity: 1;
+  }
+  .copy-btn:hover {
+    color: #e6b450;
+    border-color: #e6b45055;
+  }
+  .copy-btn--done {
+    color: #76c490 !important;
+    border-color: #76c49055 !important;
+    opacity: 1 !important;
+  }
+
+  /* mobile: always visible */
+  @media (max-width: 860px) {
+    .copy-btn { opacity: 1; }
   }
 </style>

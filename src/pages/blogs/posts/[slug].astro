@@ -1,5 +1,6 @@
 ---
 import BlogSelectionLayout from "@/layouts/BlogLayout.astro";
+import BlogPostLayout from "@/layouts/BlogPostLayout.astro";
 import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
@@ -15,5 +16,7 @@ const { Content } = await render(entry);
 ---
 
 <BlogSelectionLayout>
-  <Content />
+  <BlogPostLayout frontmatter={entry.data}>
+    <Content />
+  </BlogPostLayout>
 </BlogSelectionLayout>

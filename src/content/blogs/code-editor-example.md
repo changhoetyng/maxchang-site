@@ -1,0 +1,170 @@
+---
+layout: ../../layouts/BlogPostLayout.astro
+title: "Building a Rate Limiter from Scratch"
+author: Max Chang
+date: May 3, 2025
+description: "A walkthrough of implementing a token bucket rate limiter in TypeScript, from the core algorithm to a production-ready middleware."
+---
+
+Rate limiting is one of those things every backend needs but few people implement themselves. Most reach for a library — which is fine — but understanding how it works under the hood makes you a better engineer. Let's build one.
+
+## The Token Bucket Algorithm
+
+The idea is simple: each client gets a "bucket" that holds up to `N` tokens. Every request consumes one token. Tokens refill at a fixed rate over time. If the bucket is empty, the request is rejected.
+
+```typescript
+interface Bucket {
+  tokens: number;
+  lastRefill: number;
+}
+
+class TokenBucket {
+  private buckets = new Map<string, Bucket>();
+
+  constructor(
+    private capacity: number,
+    private refillRate: number // tokens per second
+  ) {}
+
+  consume(clientId: string): boolean {
+    const now = Date.now();
+    const bucket = this.getOrCreate(clientId, now);
+
+    this.refill(bucket, now);
+
+    if (bucket.tokens < 1) return false;
+
+    bucket.tokens -= 1;
+    return true;
+  }
+
+  private refill(bucket: Bucket, now: number) {
+    const elapsed = (now - bucket.lastRefill) / 1000;
+    bucket.tokens = Math.min(
+      this.capacity,
+      bucket.tokens + elapsed * this.refillRate
+    );
+    bucket.lastRefill = now;
+  }
+
+  private getOrCreate(clientId: string, now: number): Bucket {
+    if (!this.buckets.has(clientId)) {
+      this.buckets.set(clientId, { tokens: this.capacity, lastRefill: now });
+    }
+    return this.buckets.get(clientId)!;
+  }
+}
+```
+
+The key insight is the `refill` step: instead of running a background timer, we calculate how many tokens *should* have accumulated since the last request. This is lazy evaluation — cheaper and simpler.
+
+## Wiring It Up as Express Middleware
+
+The core algorithm is pure logic, so wrapping it in Express middleware is straightforward.
+
+```typescript
+import { Request, Response, NextFunction } from "express";
+
+export function rateLimiter(capacity: number, refillRate: number) {
+  const bucket = new TokenBucket(capacity, refillRate);
+
+  return (req: Request, res: Response, next: NextFunction) => {
+    const clientId = req.ip ?? "unknown";
+
+    if (!bucket.consume(clientId)) {
+      res.status(429).json({ error: "Too many requests" });
+      return;
+    }
+
+    next();
+  };
+}
+```
+
+Then in your app:
+
+```typescript
+import express from "express";
+import { rateLimiter } from "./rateLimiter";
+
+const app = express();
+
+// 10 requests capacity, refills at 2 per second
+app.use("/api", rateLimiter(10, 2));
+
+app.get("/api/data", (req, res) => {
+  res.json({ data: "here you go" });
+});
+```
+
+## Persisting State with Redis
+
+The in-memory `Map` works for a single server instance. In production you have multiple instances, so state needs to live in Redis.
+
+```python
+import redis
+import time
+
+r = redis.Redis(host="localhost", port=6379)
+
+def consume(client_id: str, capacity: int, refill_rate: float) -> bool:
+    key = f"ratelimit:{client_id}"
+    now = time.time()
+
+    pipe = r.pipeline()
+    pipe.hgetall(key)
+    result = pipe.execute()[0]
+
+    tokens = float(result.get(b"tokens", capacity))
+    last_refill = float(result.get(b"last_refill", now))
+
+    elapsed = now - last_refill
+    tokens = min(capacity, tokens + elapsed * refill_rate)
+
+    if tokens < 1:
+        return False
+
+    tokens -= 1
+    r.hset(key, mapping={"tokens": tokens, "last_refill": now})
+    r.expire(key, 3600)
+    return True
+```
+
+> **Note:** The Redis version has a race condition between the read and write. In production, use a Lua script to make it atomic — Redis executes Lua scripts as a single transaction.
+
+## Testing It
+
+A simple test to verify the bucket empties and refills correctly:
+
+```typescript
+describe("TokenBucket", () => {
+  it("rejects requests when empty", () => {
+    const bucket = new TokenBucket(3, 1);
+
+    expect(bucket.consume("user1")).toBe(true);
+    expect(bucket.consume("user1")).toBe(true);
+    expect(bucket.consume("user1")).toBe(true);
+    expect(bucket.consume("user1")).toBe(false); // empty
+  });
+
+  it("refills over time", async () => {
+    const bucket = new TokenBucket(1, 10); // 10 tokens/sec
+
+    expect(bucket.consume("user2")).toBe(true);
+    expect(bucket.consume("user2")).toBe(false);
+
+    await new Promise((r) => setTimeout(r, 150)); // wait 150ms
+
+    expect(bucket.consume("user2")).toBe(true); // 1.5 tokens refilled
+  });
+});
+```
+
+## Wrapping Up
+
+The finished rate limiter is about 50 lines of logic. The inline `consume` call is `O(1)` and the only external dependency in the Redis version is `ioredis`.
+
+Key things to remember:
+- Use `refillRate` and `capacity` as separate levers — they control burst tolerance vs. sustained throughput independently
+- Always add a `Retry-After` header to 429 responses so clients know when to back off
+- The in-memory version is fine for local dev; swap in Redis before you go to production
