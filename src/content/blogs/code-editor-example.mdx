@@ -1,12 +1,27 @@
 ---
-layout: ../../layouts/BlogPostLayout.astro
 title: "Building a Rate Limiter from Scratch"
 author: Max Chang
 date: May 3, 2025
 description: "A walkthrough of implementing a token bucket rate limiter in TypeScript, from the core algorithm to a production-ready middleware."
 ---
 
+import Terminal from '../../components/blog/Terminal.astro';
+
 Rate limiting is one of those things every backend needs but few people implement themselves. Most reach for a library — which is fine — but understanding how it works under the hood makes you a better engineer. Let's build one.
+
+## Setup
+
+Install the dependencies and scaffold the project before writing any logic.
+
+<Terminal title="bash" code={`$ mkdir rate-limiter && cd rate-limiter
+$ npm init -y
+Wrote to /rate-limiter/package.json
+
+$ npm install express
+added 63 packages in 1.4s
+
+$ npm install -D typescript @types/node @types/express ts-node
+added 12 packages in 0.9s`} />
 
 ## The Token Bucket Algorithm
 
@@ -81,25 +96,48 @@ export function rateLimiter(capacity: number, refillRate: number) {
 }
 ```
 
-Then in your app:
+Start the server and hit the endpoint a few times to see the limiter in action.
 
-```typescript
-import express from "express";
-import { rateLimiter } from "./rateLimiter";
+<Terminal title="bash" code={`$ ts-node src/index.ts
+Server running on http://localhost:3000
 
-const app = express();
+$ curl http://localhost:3000/api/data
+{"data":"here you go"}
 
-// 10 requests capacity, refills at 2 per second
-app.use("/api", rateLimiter(10, 2));
+$ curl http://localhost:3000/api/data
+{"data":"here you go"}
 
-app.get("/api/data", (req, res) => {
-  res.json({ data: "here you go" });
-});
-```
+$ for i in {1..12}; do curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3000/api/data; done
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+429
+429`} />
+
+After 10 requests the bucket empties and the next two come back `429`.
 
 ## Persisting State with Redis
 
 The in-memory `Map` works for a single server instance. In production you have multiple instances, so state needs to live in Redis.
+
+<Terminal title="redis-cli" code={`$ redis-cli ping
+PONG
+
+$ redis-cli hgetall ratelimit:127.0.0.1
+1) "tokens"
+2) "9.82"
+3) "last_refill"
+4) "1714521600.342"
+
+$ redis-cli ttl ratelimit:127.0.0.1
+3547`} />
 
 ```python
 import redis
@@ -134,7 +172,17 @@ def consume(client_id: str, capacity: int, refill_rate: float) -> bool:
 
 ## Testing It
 
-A simple test to verify the bucket empties and refills correctly:
+Run the test suite to verify the bucket empties and refills correctly.
+
+<Terminal title="bash" code={`$ npx jest --testPathPattern=tokenBucket
+PASS  src/tokenBucket.test.ts
+  TokenBucket
+    ✓ rejects requests when empty (3ms)
+    ✓ refills over time (158ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       2 passed, 2 total
+Time:        0.8s`} />
 
 ```typescript
 describe("TokenBucket", () => {
