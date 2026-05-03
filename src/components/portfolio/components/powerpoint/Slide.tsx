@@ -2,14 +2,14 @@ import SlideContent from "./SlideTableContent";
 import "./Slide.css";
 export default function Slide({
   isSidePanel,
-  Page,
+  src,
 }: Readonly<{
   isSidePanel: boolean;
-  Page: any;
+  src: string;
 }>) {
   return (
     <SlideContent isSidePanel={isSidePanel}>
-      <Page className="w-full h-full p-3" />
+      <img src={src} className="w-full h-full p-3" />
     </SlideContent>
   );
 }

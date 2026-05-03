@@ -5,7 +5,7 @@ import BlogSelectionLayout from "@/layouts/BlogLayout.astro";
 import { getCollection } from "astro:content";
 
 export async function getStaticPaths({ paginate }: { paginate: any }) {
-  const blogEntries = await getCollection("blogs");
+  const blogEntries = await getCollection("blog");
   // Generate pages from our array of astronauts, with 2 to a page
   return paginate(blogEntries, { pageSize: 10 });
 }
@@ -19,7 +19,7 @@ const { page }: any = Astro.props;
       <ul class="mt-4">
         {
           page.data.map((blogPostEntry: any) => (
-            <PostsSelectionCard slug={blogPostEntry.slug}>
+            <PostsSelectionCard slug={blogPostEntry.id}>
               <slot slot="title">{blogPostEntry.data.title}</slot>
               <slot slot="date">{blogPostEntry.data.date}</slot>
               <slot slot="description">{blogPostEntry.data.description}</slot>

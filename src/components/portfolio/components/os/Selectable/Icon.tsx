@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import Draggable from "react-draggable";
 import clsx from "clsx";
 
@@ -26,9 +27,10 @@ export default function Icon({
     }
   }
 
+  const nodeRef = useRef<HTMLButtonElement>(null);
   return (
-    <Draggable position={position} disabled={disabled}>
-      <button
+    <Draggable nodeRef={nodeRef} position={position} disabled={disabled}>
+      <button ref={nodeRef}
         onMouseDownCapture={() => clickHandler()}
         onDoubleClick={() => (onDoubleClick ? onDoubleClick() : "")}
         className={clsx(

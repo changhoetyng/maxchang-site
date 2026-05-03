@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import Draggable from "react-draggable";
 import WindowHeader from "./WindowHeader";
 
@@ -5,9 +6,10 @@ export default function Window({
   folder,
   onClickClose,
 }: Readonly<{ folder: React.ReactNode[]; onClickClose?: () => void }>) {
+  const nodeRef = useRef<HTMLDivElement>(null);
   return (
-    <Draggable positionOffset={{ x: "22.5%", y: "22.5%" }}>
-      <div className="draggable-window">
+    <Draggable nodeRef={nodeRef} positionOffset={{ x: "22.5%", y: "22.5%" }}>
+      <div ref={nodeRef} className="draggable-window">
         <WindowHeader
           onClickClose={() => (onClickClose ? onClickClose() : null)}
         />

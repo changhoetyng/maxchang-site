@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import wallpaper from "/public/wallpaper.jpg";
+const wallpaper = "/wallpaper.jpg";
 import "./Desktop.css";
 
 export default function Desktop({
