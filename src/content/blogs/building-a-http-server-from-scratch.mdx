@@ -1,9 +1,79 @@
 ---
-title: "From Zero to HTTP (Part 1) — I just wanted to print Hello World...."
+title: "From Zero to HTTP (Part 1) — Building a web server with nothing but C"
 author: Max Chang
 date: May 3, 2026
-description: "A backend engineer with cronic addiction to programming trying to build his own server."
 ---
 
-## Heading 1
-Check
+# Introduction
+
+I have been a backend developer for a while now, but in this age of AI and highly abstracted frameworks,
+I realised I have absolutely no idea how any of it works underneath Express.js and FastAPI.
+Embarrassing, I know. So this is part of my
+learning journey on understanding how a simple HTTP server works, by peeling all the abstractions layer
+and building from the ground up, armed with nothing but Linux man pages and a concerning amount of free time.
+
+# Network Fundamentals
+
+## What is a Port
+
+## How TCP Works
+
+## The TCP Handshake
+
+# What is a Socket
+
+## File Descriptors (fd) — Sockets Are Files??
+
+# The socket() Call
+
+## What the Kernel Creates
+
+# Giving the Socket an Address
+
+## bind()
+
+### INADDR_ANY — Binding to All Interfaces vs a Specific IP
+
+## Endianness
+
+### Why htons() Exists
+
+# Starting the Server
+
+## listen()
+
+## Backlog Queue
+
+### SOMAXCONN
+
+## accept()
+
+# Handling a Client
+
+## The Accept Loop
+
+## write() vs send()
+
+## What an HTTP Response Looks Like
+
+## What is \r\n?
+
+## Why Content-Length Matters
+
+## How the Kernel Writes Back to the Client
+
+## Closing the Connection — What Happens if You Don't Call close()
+
+# Graceful Shutdown
+
+## What Happens on Ctrl+C
+
+## Using signal() to Catch SIGINT
+
+## Closing the Socket Before Exit
+
+## sigaction() vs signal()
+
+# Testing Your Server
+
+## Using curl and a Browser
