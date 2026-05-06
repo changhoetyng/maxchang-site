@@ -1,0 +1,168 @@
+---
+interface Props {
+  src: string;
+  caption?: string;
+  alt?: string;
+}
+const { src, caption, alt = "" } = Astro.props;
+const id = `zsvg-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<figure class="zsvg-frame" data-id={id}>
+  <button class="zsvg-trigger" aria-label="Zoom diagram" data-id={id}>
+    <img src={src} alt={alt} class="zsvg-img" loading="lazy" />
+    <span class="zsvg-hint">click to zoom</span>
+  </button>
+  {caption && <figcaption class="zsvg-caption">{caption}</figcaption>}
+</figure>
+
+<dialog class="zsvg-modal" id={id} aria-label={alt || "Diagram"}>
+  <button class="zsvg-close" aria-label="Close">✕</button>
+  <div class="zsvg-modal-inner">
+    <img src={src} alt={alt} class="zsvg-modal-img" />
+  </div>
+</dialog>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>(".zsvg-trigger").forEach((btn) => {
+    const id = btn.dataset.id!;
+    const dialog = document.getElementById(id) as HTMLDialogElement | null;
+    if (!dialog) return;
+
+    btn.addEventListener("click", () => dialog.showModal());
+
+    dialog.querySelector(".zsvg-close")?.addEventListener("click", () => dialog.close());
+
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && dialog.open) dialog.close();
+    });
+  });
+</script>
+
+<style>
+  .zsvg-frame {
+    margin: 1.75rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .zsvg-trigger {
+    position: relative;
+    display: block;
+    width: 100%;
+    background: #0b0e14;
+    border: 1px solid #1a1f2e;
+    border-radius: 10px;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.02),
+      0 16px 48px rgba(0, 0, 0, 0.6);
+    padding: 1.25rem;
+    cursor: zoom-in;
+    overflow: hidden;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+
+  .zsvg-trigger:hover {
+    border-color: #e6b45044;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.03),
+      0 20px 56px rgba(0, 0, 0, 0.7),
+      0 0 24px rgba(230, 180, 80, 0.06);
+  }
+
+  .zsvg-img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .zsvg-hint {
+    position: absolute;
+    bottom: 0.6rem;
+    right: 0.75rem;
+    font-family: "Andale Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: #505070;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  .zsvg-trigger:hover .zsvg-hint {
+    opacity: 1;
+  }
+
+  .zsvg-caption {
+    font-family: "Andale Mono", monospace;
+    font-size: 11px;
+    color: #505070;
+    letter-spacing: 0.04em;
+    text-align: center;
+  }
+
+  /* ── Modal ── */
+  .zsvg-modal {
+    background: #0b0e14;
+    border: 1px solid #1a1f2e;
+    border-radius: 12px;
+    box-shadow: 0 32px 96px rgba(0, 0, 0, 0.85);
+    padding: 1.5rem;
+    max-width: min(90vw, 1100px);
+    width: 90vw;
+    max-height: 90vh;
+    overflow: auto;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .zsvg-modal::backdrop {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+  }
+
+  .zsvg-close {
+    position: sticky;
+    top: 0;
+    float: right;
+    background: none;
+    border: 1px solid #1a1f2e;
+    border-radius: 4px;
+    color: #505070;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 2px 8px;
+    transition:
+      color 0.15s,
+      border-color 0.15s;
+    z-index: 1;
+  }
+
+  .zsvg-close:hover {
+    color: #e6b450;
+    border-color: #e6b45055;
+  }
+
+  .zsvg-modal-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.5rem;
+  }
+
+  .zsvg-modal-img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+</style>

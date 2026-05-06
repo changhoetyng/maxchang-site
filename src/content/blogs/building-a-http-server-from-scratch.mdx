@@ -1,52 +1,110 @@
 ---
-title: "From Zero to HTTP (Part 1) — Building a web server with nothing but C"
+title: "Building a web server with nothing but C"
 author: Max Chang
 date: May 3, 2026
 ---
+
+import Terminal from "../../components/blog/Terminal.astro";
+import ZoomableSvg from "../../components/blog/ZoomableSvg.astro";
 
 # Introduction
 
 I have been a backend developer for a while now, but in this age of AI and highly abstracted frameworks,
 I realised I have absolutely no idea how any of it works underneath Express.js and FastAPI.
 Embarrassing, I know. So this is part of my
-learning journey on understanding how a simple HTTP server works, by peeling all the abstractions layer
-and building from the ground up, armed with nothing but Linux man pages and a concerning amount of free time.
+learning journey on understanding how a simple HTTP server works, peeling all the abstraction layers
+and building from the ground up with nothing but Linux man pages and a concerning amount of free time.
+
+> **Note** - The code in this series is written for Linux and POSIX-compliant systems (macOS included).
+> So if you're on Windows, I'm sorry, but maybe consider WSL.
 
 # Network Fundamentals
 
 ## What is a Port
 
-## How TCP Works
+Ports are a system-level resource managed by the OS that allows the OS to route packets to the right process.
+Think of it like an apartment building, the IP Address will get you to the building, but the port number will be the room number.
+Note that the range 0 - 1023 is off-limits unless you're root because the kernel reserves them for well-known services like 80 for HTTP and 443 for HTTPS.
 
-## The TCP Handshake
+<blockquote cite="https://man7.org/linux/man-pages/man7/ip.7.html">
+  <p>The port numbers below 1024 are called privileged ports (or sometimes: reserved ports)</p>
+  <footer>
+    —{" "}
+    <cite>
+      <a href="https://man7.org/linux/man-pages/man7/ip.7.html">man7: ip(7)</a>
+    </cite>
+  </footer>
+</blockquote>
+
+You can actually see this in action:
+
+<Terminal
+  title="bash"
+  code={`
+$ maxchang@MacBookPro http-server % lsof -i :8080
+COMMAND     PID         USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+http-serv 86234 hoetyngchang    3u  IPv4 0x4f53dea081d8aad3      0t0  TCP *:http-alt (LISTEN)
+`}
+></Terminal>
+
+A few things worth noting - `PID` is the process ID, [`FD` is the File Descriptor](#file-descriptors-fd--sockets-are-files), the kernel assigned to your socket.
+`TCP *: http-alt (LISTEN)` shows the socket is bound to all [interfaces](#interfaces) `*` on port 8080. and is listening to connections.
 
 # What is a Socket
 
+A socket is essentially just an abstracted interface that is provided by a Unix-based system for communication between processes, either with
+machines over the network (e.g. loading a webpage, calling an API), or even other processes within the same machine
+(e.g. talking to a local PostgreSQL/redis server).
+
 ## File Descriptors (fd) — Sockets Are Files??
+
+Everything in a Unix-based system, anything that is related to files, sockets, or Input/Output(I/O), is treated as a file.
+The kernel represents each one as a `file descriptor (fd)`, which is just an integer that references an entry in the open file table.
+
+Each entry in the open file table is a [`struct file`](https://github.com/torvalds/linux/blob/v6.8/include/linux/fs.h#L994)
+where it determines what each `read()`, `write()` and `close()` actually do for a certain resource.
+`struct file` will then point to an inode. For sockets specifically, it connects through a
+[`struct socket`](https://github.com/torvalds/linux/blob/master/include/linux/net.h#L137) in the kernel.
+
+<ZoomableSvg
+  src="/images/blogs/fd_open_file_table_inode.svg"
+  caption="fd → open file table → inode"
+  alt="Diagram showing how file descriptors map to the kernel open file table and then to inodes"
+/>
+
+Which is why you'll be able to write/close a socket like how you would do it when writing files
+
+```cpp
+// Writing to a file
+int fd = open("output.txt", O_WRONLY | O_CREAT, 0644);
+write(fd, "Hello World!\n", 13);
+close(fd);
+
+// Writing to a socket
+int client_fd = accept(socket, config, &addr_length);
+write(client_fd, response.c_str(), response.size());
+close(client_fd);
+```
 
 # The socket() Call
 
 ## What the Kernel Creates
 
+## Endianness
+
+## Interfaces
+
 # Giving the Socket an Address
 
 ## bind()
 
-### INADDR_ANY — Binding to All Interfaces vs a Specific IP
-
-## Endianness
-
-### Why htons() Exists
-
 # Starting the Server
 
-## listen()
+## listen() and accept()
 
-## Backlog Queue
+### The TCP Handshake
 
-### SOMAXCONN
-
-## accept()
+### Backlog Queue
 
 # Handling a Client
 
