@@ -56,6 +56,22 @@ A socket is essentially just an abstracted interface that is provided by a Unix-
 machines over the network (e.g. loading a webpage, calling an API), or even other processes within the same machine
 (e.g. talking to a local PostgreSQL/redis server).
 
+```cpp
+// Refer to: https://man7.org/linux/man-pages/man2/socket.2.html for more info
+int create_socket() {
+    // AF_INET    — uses IPv4
+    // SOCK_STREAM — reliable, ordered byte stream (TCP)
+
+    int tcp_socket = socket(AF_INET, SOCK_STREAM, 0);
+
+    if (tcp_socket < 0) {
+        err(EXIT_FAILURE, "socket");
+    }
+
+    return tcp_socket;
+}
+```
+
 ## File Descriptors (fd) — Sockets Are Files??
 
 Everything in a Unix-based system, anything that is related to files, sockets, or Input/Output(I/O), is treated as a file.
@@ -86,15 +102,37 @@ write(client_fd, response.c_str(), response.size());
 close(client_fd);
 ```
 
-# The socket() Call
+# Giving the Socket an Address
 
-## What the Kernel Creates
+## struct sockaddr_in
+
+To setup the socket with an address, we need to first describe the socket's address using
+`sockaddr_in` - the config struct for IPv4 connections [man7](https://man7.org/linux/man-pages/man3/sockaddr.3type.html)
+
+```cpp
+struct sockaddr_in config = {
+  .sin_family = AF_INET,
+  .sin_port = htons(PORT),
+  .sin_addr.s_addr = INADDR_ANY
+};
+```
 
 ## Endianness
 
-## Interfaces
+When passing `sin_port`, I just assumed passing 8080 would work, as it only needs a port number, right?
 
-# Giving the Socket an Address
+But after some research, I figured that it was due to different machines interpretation of byte order. There
+There is a difference in how bytes are stored in a computer.
+
+- **Big-endian** — most significant byte first (what the network expects)
+- **Little-endian** — least significant byte first (what most modern CPUs use)
+
+So `8080` on your machine is stored as `0x90 0x1F`, but the network expects `0x1F 0x90`,
+leading to the wrong ports being binded.
+
+So by calling `htons`, the bytes will be flipped on little-endian machines, while no-ops on big-endian machines.
+
+## Network Interfaces
 
 ## bind()
 
