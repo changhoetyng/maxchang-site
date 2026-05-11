@@ -121,7 +121,7 @@ struct sockaddr_in config = {
 
 When passing `sin_port`, I just assumed passing 8080 would work, as it only needs a port number, right?
 
-But after some research, I figured that it was due to different machines interpretation of byte order. There
+But after some research, I figured that it was due to different machines interpretation of byte order.
 There is a difference in how bytes are stored in a computer.
 
 - **Big-endian** — most significant byte first (what the network expects)
@@ -171,8 +171,6 @@ When binding a socket, you're free to choose which interface to accept connectio
 > since it claims `0.0.0.0:8080`, overlapping every interface.
 > `localhost` resolves to `127.0.0.1`, so `curl localhost:8080` only reaches a server bound
 > to `127.0.0.1` or `INADDR_ANY` — not one bound to `10.0.0.98`.
-
-## bind()
 
 # Starting the Server
 
