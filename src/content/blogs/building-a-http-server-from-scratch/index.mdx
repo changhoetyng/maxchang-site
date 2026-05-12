@@ -4,8 +4,9 @@ author: Max Chang
 date: May 3, 2026
 ---
 
-import Terminal from "../../components/blog/Terminal.astro";
-import ZoomableSvg from "../../components/blog/ZoomableSvg.astro";
+import Terminal from "../../../components/blog/Terminal.astro";
+import ZoomableSvg from "../../../components/blog/ZoomableSvg.astro";
+import fdOpenFileTableInodeSrc from "./fd_open_file_table_inode.svg?url";
 
 # Introduction
 
@@ -83,7 +84,7 @@ where it determines what each `read()`, `write()` and `close()` actually do for 
 [`struct socket`](https://github.com/torvalds/linux/blob/master/include/linux/net.h#L137) in the kernel.
 
 <ZoomableSvg
-  src="/images/blogs/fd_open_file_table_inode.svg"
+  src={fdOpenFileTableInodeSrc}
   caption="fd → open file table → inode"
   alt="Diagram showing how file descriptors map to the kernel open file table and then to inodes"
 />
@@ -176,6 +177,30 @@ When binding a socket, you're free to choose which interface to accept connectio
 
 ## listen() and accept()
 
+Once the socket is bounded, two calls is needed for the server to start receiving requests
+
+```cpp
+void start_listening(int socket) {
+    if (listen(socket, SOMAXCONN) < 0) {
+        err(EXIT_FAILURE, "listen");
+    }
+}
+
+void start_server(int socket, sockaddr *config) {
+    while (1) {
+        socklen_t addr_length = sizeof(*config);
+        int client = accept(socket, config, &addr_length);
+        if (client < 0) {
+            err(EXIT_FAILURE, "accept");
+        }
+        handle_client(client);
+    }
+}
+```
+
+`listen()` doesn't block and accept anything. It's main purpose is marking the socket as passive.
+Incoming connections is being handed off to `accept()`, which returns a new `fd` for each client. The new `fd` is where the data exchange happens.
+
 ### The TCP Handshake
 
 ### Backlog Queue
@@ -195,16 +220,6 @@ When binding a socket, you're free to choose which interface to accept connectio
 ## How the Kernel Writes Back to the Client
 
 ## Closing the Connection — What Happens if You Don't Call close()
-
-# Graceful Shutdown
-
-## What Happens on Ctrl+C
-
-## Using signal() to Catch SIGINT
-
-## Closing the Socket Before Exit
-
-## sigaction() vs signal()
 
 # Testing Your Server
 
