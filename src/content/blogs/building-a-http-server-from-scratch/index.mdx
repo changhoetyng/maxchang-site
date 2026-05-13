@@ -1,5 +1,5 @@
 ---
-title: "Building a web server with nothing but C"
+title: "Building a simple web server with nothing but C"
 author: Max Chang
 date: May 3, 2026
 ---
@@ -7,6 +7,7 @@ date: May 3, 2026
 import Terminal from "../../../components/blog/Terminal.astro";
 import ZoomableSvg from "../../../components/blog/ZoomableSvg.astro";
 import fdOpenFileTableInodeSrc from "./fd_open_file_table_inode.svg?url";
+import TcpHandshakeWithListen from "./tcp_handshake_with_listen.svg?url";
 
 # Introduction
 
@@ -203,23 +204,66 @@ Incoming connections is being handed off to `accept()`, which returns a new `fd`
 
 ### The TCP Handshake
 
+`listen()` marks the socket as passive, allowing the kernel to start handling incoming connections for that socket automatically.
+After completing the TCP handshake, the connection will then be placed in a backlog queue.
+
+<ZoomableSvg
+  src={TcpHandshakeWithListen}
+  caption="TCP Handshake"
+  alt="Diagram showing the TCP three-way handshake — listen() marks the socket as passive, followed by SYN, SYN-ACK, and ACK between client and kernel, before accept() hands the connection fd to your code"
+/>
+
 ### Backlog Queue
+
+After the TCP handshake is done, it will be in a FIFO accept queue ([`icsk_accept_queue`](https://github.com/torvalds/linux/blob/v6.8/include/net/inet_connection_sock.h#L58)),
+where it will wait for the server to run `accept()`. `listen(socket, SOMAXCONN)` where `SOMAXCONN` represents the constant of the system's
+maximum queue size. The kernel will simply drop new connections when it's full, which causes a timeout.
 
 # Handling a Client
 
-## The Accept Loop
-
-## write() vs send()
-
 ## What an HTTP Response Looks Like
 
-## What is \r\n?
+```text
+HTTP/1.1 200 OK\r\n
+Content-Length: 13\r\n
+\r\n
+Hello World!\n
+```
+
+HTTP Response is just a structured string splitted into three parts, **Status Line**,
+**Headers**, and **Body**.
+
+Before diving into the HTTP response, it is essential to understand what `\r\n` means.
+It stands for **Carriage Return** (`\r`, moves the cursor back to the start of the current line) and
+**Line Feed**(`\n`, moves down to a new line),
+two control characters from the typewriter era.
+Together they form `CRLF`, which HTTP requires as its line ending.
+
+- **Status Line** `HTTP/1.1 200 OK` — the protocol version followed by a status code and reason phrase.
+
+<blockquote cite="https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html">
+  <p>
+    The first line of a Response message is the Status-Line, consisting of the protocol version
+    followed by a numeric status code and its associated textual phrase, with each element separated
+    by SP characters.
+    <br />
+
+    <b>Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF</b>
+
+  </p>
+  <footer>
+    —{" "}
+    <cite>
+      <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html">RFC 2616 §6</a>
+    </cite>
+  </footer>
+</blockquote>
 
 ## Why Content-Length Matters
 
 ## How the Kernel Writes Back to the Client
 
-## Closing the Connection — What Happens if You Don't Call close()
+## Closing the Connection
 
 # Testing Your Server
 
