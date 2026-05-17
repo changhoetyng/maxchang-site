@@ -8,6 +8,7 @@ import Terminal from "../../../components/blog/Terminal.astro";
 import ZoomableSvg from "../../../components/blog/ZoomableSvg.astro";
 import fdOpenFileTableInodeSrc from "./fd_open_file_table_inode.svg?url";
 import TcpHandshakeWithListen from "./tcp_handshake_with_listen.svg?url";
+import ContentLengthByteStream from "./content_length_byte_stream.svg?url";
 
 # Introduction
 
@@ -221,6 +222,17 @@ maximum queue size. The kernel will simply drop new connections when it's full, 
 
 # Handling a Client
 
+```cpp
+void handle_client(int client_fd) {
+    std::string body = "Hello World!\n";
+    std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " +
+        std::to_string(body.size()) + "\r\n\r\n" + body;
+
+    write(client_fd, response.c_str(), response.size());
+    close(client_fd);
+}
+```
+
 ## What an HTTP Response Looks Like
 
 ```text
@@ -261,10 +273,43 @@ Together they form `CRLF`, which HTTP requires as its line ending.
 
 ## Why Content-Length Matters
 
+**TCP** itself is just a stream of bytes. So how does the client know when it has received a full response, and not
+just part of it? `Content Length` tells the client exactly how many bytes to expect, allowing it to stop once it reaches the
+expected number.
+
+<ZoomableSvg
+  src={ContentLengthByteStream}
+  caption="Without Content-Length, the client has no idea when to stop reading"
+  alt="Two side-by-side diagrams comparing a byte stream without Content-Length, where the client hangs, versus one with Content-Length: 13, where the client stops at exactly the right byte"
+/>
+
 ## How the Kernel Writes Back to the Client
+
+When `write()` is called, it copies the bytes into a **send buffer** where the kernel will handle the rest.
+Think of **send buffer** as some sort of mailbox, where the kernel is the mailman, which will pick it up and handle the delivery.
+Underneath, the kernel handles the delivery by flushing out the send buffer, where it divides them into TCP chunks, wraps them
+into an IP Packet, and hands them off to the NIC to send over the wire. Beej's Guide describes this encapsulation nicely:
+
+<blockquote cite="https://beej.us/guide/bgnet/html/split/what-is-a-socket.html#lowlevel">
+  <p>
+    A packet is born, the packet is wrapped ("encapsulated") in a header by the first protocol, then
+    the whole thing is encapsulated again by the next protocol (say, UDP), then again by the next
+    (IP), then again by the final protocol on the hardware layer (say, Ethernet).
+  </p>
+  <footer>
+    —{" "}
+    <cite>
+      <a href="https://beej.us/guide/bgnet/html/split/what-is-a-socket.html#lowlevel">
+        Beej's Guide to Network Programming §2.2
+      </a>
+    </cite>
+  </footer>
+</blockquote>
 
 ## Closing the Connection
 
 # Testing Your Server
+
+## Full Code
 
 ## Using curl and a Browser
