@@ -224,11 +224,21 @@ maximum queue size. The kernel will simply drop new connections when it's full, 
 
 ```cpp
 void handle_client(int client_fd) {
+    char buf[4096];
+    int bytes_read = read(client_fd, buf, sizeof(buf) - 1);
+    buf[bytes_read] = '\0';  // null terminate
+    printf("%s\n", buf);     // print the raw request
+
     std::string body = "Hello World!\n";
     std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " +
         std::to_string(body.size()) + "\r\n\r\n" + body;
 
     write(client_fd, response.c_str(), response.size());
+
+    char drain[1024];
+    while (read(client_fd, drain, sizeof(drain)) > 0);
+
+    shutdown(client_fd, SHUT_WR);
     close(client_fd);
 }
 ```
@@ -283,6 +293,15 @@ expected number.
   alt="Two side-by-side diagrams comparing a byte stream without Content-Length, where the client hangs, versus one with Content-Length: 13, where the client stops at exactly the right byte"
 />
 
+## Reading the client's request
+
+`read()` accepts `(client_df, buffer, size_of_buffer). A **buffer** is just a temporary space in the memory that holds
+data while it's being moved from one place to another.
+
+Note that the code above only reads requests up to 4096 bytes, with the rest
+staying on the kernel's **receive buffer**. This is fine for a simple `GET` request, but a
+`POST` with a large body would need a loop to drain the remaining bytes.
+
 ## How the Kernel Writes Back to the Client
 
 When `write()` is called, it copies the bytes into a **send buffer** where the kernel will handle the rest.
@@ -308,8 +327,49 @@ into an IP Packet, and hands them off to the NIC to send over the wire. Beej's G
 
 ## Closing the Connection
 
+Once the response is sent, we need to close the connection. There are two calls that are needed -
+`shutdown()` and `close()`.
+
+`close()` releases the fd and cuts the connection for both sides.
+
+`shutdown(client_fd, SHUT_WR)` sends a `FIN` to the client, letting the client know we're closing
+the connection while allowing us to drain the remaining bytes before closing the connection. You can actually
+see this in action by listening on the port with `tcpdump`:
+
+<Terminal
+  title="bash"
+  code={`
+$ maxchang@MacBookPro http-server % sudo tcpdump -i lo0 port 8080 -S
+
+# IPv6 attempt — rejected, server only binds AF_INET (IPv4)
+
+IP6 localhost.50523 > localhost.http-alt: Flags [S]
+IP6 localhost.http-alt > localhost.50523: Flags [R.]
+
+# three-way handshake
+
+IP localhost.50524 > localhost.http-alt: Flags [S] # SYN
+IP localhost.http-alt > localhost.50524: Flags [S.] # SYN-ACK
+IP localhost.50524 > localhost.http-alt: Flags [.] # ACK
+IP localhost.http-alt > localhost.50524: Flags [.] # ACK
+
+# data exchange
+
+IP localhost.50524 > localhost.http-alt: Flags [P.] length 77: HTTP: GET / HTTP/1.1
+IP localhost.http-alt > localhost.50524: Flags [.] # ACK
+IP localhost.http-alt > localhost.50524: Flags [P.] length 52: HTTP: HTTP/1.1 200 OK
+
+# four-way teardown
+
+IP localhost.http-alt > localhost.50524: Flags [F.] # server FIN — shutdown(SHUT_WR)
+IP localhost.50524 > localhost.http-alt: Flags [.] # ACK for HTTP data
+IP localhost.50524 > localhost.http-alt: Flags [.] # ACK for FIN
+IP localhost.50524 > localhost.http-alt: Flags [F.] # client FIN
+IP localhost.http-alt > localhost.50524: Flags [.] # ACK
+`}
+
+> </Terminal>
+
 # Testing Your Server
 
 ## Full Code
-
-## Using curl and a Browser
