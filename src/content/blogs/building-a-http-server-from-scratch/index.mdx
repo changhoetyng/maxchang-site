@@ -14,7 +14,7 @@ import ContentLengthByteStream from "./content_length_byte_stream.svg?url";
 
 I have been a backend developer for a while now, but in this age of AI and highly abstracted frameworks,
 I realised I have absolutely no idea how any of it works underneath Express.js and FastAPI.
-Embarrassing, I know. So this is part of my
+This is part of my
 learning journey on understanding how a simple HTTP server works, peeling all the abstraction layers
 and building from the ground up with nothing but Linux man pages and a concerning amount of free time.
 
@@ -373,3 +373,108 @@ IP localhost.http-alt > localhost.50524: Flags [.] # ACK
 # Testing Your Server
 
 ## Full Code
+
+```cpp
+#include <sys/socket.h>
+#include <err.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <limits.h>
+#include <netinet/in.h>
+#include <string>
+#include <signal.h>
+
+
+#define PORT 8080
+
+
+static int server_socket = -1;
+
+void handle_sigint(int sig) {
+    (void)sig;
+    if (server_socket != -1) {
+        printf("\nShutting down server...\n");
+        close(server_socket);
+    }
+    exit(0);
+}
+
+int create_socket() {
+    int tcp_socket = socket(AF_INET, SOCK_STREAM, 0);
+
+    if (tcp_socket < 0) {
+        err(EXIT_FAILURE, "socket");
+    }
+
+    return tcp_socket;
+}
+
+void bind_port(int socket, sockaddr *config) {
+    if (bind(socket, config, sizeof(*config)) < 0) {
+        err(EXIT_FAILURE, "binder");
+    }
+}
+
+void start_listening(int socket) {
+    if (listen(socket, SOMAXCONN) < 0) {
+        err(EXIT_FAILURE, "listen");
+    }
+}
+
+void handle_client(int client_fd) {
+    char buf[4096];
+    int bytes_read = read(client_fd, buf, sizeof(buf) - 1);
+    if (bytes_read > 0) {
+        buf[bytes_read] = '\0';
+        printf("%s\n", buf);
+    }
+
+    std::string body = "Hello World!\n";
+    std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " +
+        std::to_string(body.size()) + "\r\n\r\n" + body;
+
+    write(client_fd, response.c_str(), response.size());
+
+    shutdown(client_fd, SHUT_WR);
+
+    char drain[1024];
+    while (read(client_fd, drain, sizeof(drain)) > 0);
+
+    close(client_fd);
+}
+
+void start_server(int socket, sockaddr *config) {
+    while (1) {
+        socklen_t addr_length = sizeof(*config);
+        int client = accept(socket, config, &addr_length);
+        if (client < 0) {
+            err(EXIT_FAILURE, "accept");
+        }
+        handle_client(client);
+    }
+}
+
+
+int main() {
+    signal(SIGINT, handle_sigint);
+    struct sockaddr_in config = {
+        .sin_family = AF_INET,
+        .sin_port = htons(PORT),
+        .sin_addr.s_addr = INADDR_ANY
+    };
+
+
+    server_socket = create_socket();
+    bind_port(server_socket, (struct sockaddr *)&config);
+    start_listening(server_socket);
+    start_server(server_socket, (struct sockaddr *)&config);
+}
+```
+
+<Terminal
+  title="bash"
+  code={`
+$ maxchang@MacBookPro http-server % curl localhost:8080
+Hello World!
+`}
+></Terminal>
