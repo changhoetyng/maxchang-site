@@ -1,8 +1,8 @@
 import { useState } from "react";
 import Desktop from "./os/Desktop";
 import Icon from "./os/Selectable/Icon";
-import FOLDER_ICON from "public/icons/folder.png";
-import TEXT_EDIT_ICON from "public/icons/TextEdit.png";
+const FOLDER_ICON = "/icons/folder.png";
+const TEXT_EDIT_ICON = "/icons/TextEdit.png";
 import WindowComponent from "./os/WindowComponent";
 import Row from "./os/Selectable/Row";
 

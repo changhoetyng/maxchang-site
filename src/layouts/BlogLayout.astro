@@ -1,13 +1,14 @@
 ---
 import BlogHeaders from "@/components/headers/BlogHeaders.astro";
-import { ViewTransitions } from "astro:transitions";
+import { ClientRouter } from "astro:transitions";
+import "@/globals.css";
 ---
 
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <BlogHeaders />
-    <ViewTransitions />
+    <ClientRouter />
   </head>
   <body>
     <slot />
@@ -15,7 +16,7 @@ import { ViewTransitions } from "astro:transitions";
 </html>
 <style>
   html {
-    background-color: #1e1e1e;
+    background-color: #07070f;
     color: #fff;
   }
 </style>

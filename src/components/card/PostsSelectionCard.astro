@@ -1,36 +1,53 @@
 ---
-const { slug } = Astro.props;
+const { slug, title, date, description } = Astro.props;
 ---
 
-<div class="mb-10">
-  <a class="title" href={"posts/" + slug}>
-    <slot name="title" />
+<li class="post-card">
+  <a class="post-card-link" href={"posts/" + slug}>
+    <span class="post-card-date">{date}</span>
+    <span class="post-card-title">{title}</span>
+    {description && <p class="post-card-desc">{description}</p>}
   </a>
-  <p class="date">
-    <slot name="date" />
-  </p>
-  <p class="description">
-    <slot name="description" />
-  </p>
-</div>
+</li>
 <style>
-  .title {
-    font-size: 20px;
+  .post-card {
+    border-top: 1px solid #1a1f29;
+    padding: 1.5rem 0;
+  }
+  .post-card:last-child {
+    border-bottom: 1px solid #1a1f29;
+  }
+
+  .post-card-link {
+    display: block;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .post-card-link:hover { opacity: 0.75; }
+  .post-card-link:hover .post-card-title { color: #f5ccd4; }
+
+  .post-card-date {
+    font-family: "Andale Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: #3a3a4a;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .post-card-title {
+    font-size: 17px;
     font-weight: 600;
-    color: #f5ccd4;
+    color: #d0c0d8;
+    display: block;
+    margin-bottom: 0.4rem;
+    transition: color 0.15s;
   }
-  .title:hover {
-    text-decoration: underline;
-  }
-  .date {
-    margin-top: 15px;
+
+  .post-card-desc {
     font-size: 14px;
-    font-weight: 600;
-    color: #f5ccd4;
-  }
-  .description {
-    margin-top: 20px;
-    font-size: 16px;
-    font-weight: 400;
+    color: #505070;
+    line-height: 1.6;
+    margin: 0;
   }
 </style>

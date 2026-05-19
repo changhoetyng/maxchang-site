@@ -1,0 +1,483 @@
+---
+title: "Building a simple web server with nothing but C"
+author: Max Chang
+date: May 3, 2026
+---
+
+import Terminal from "../../../components/blog/Terminal.astro";
+import ZoomableSvg from "../../../components/blog/ZoomableSvg.astro";
+import fdOpenFileTableInodeSrc from "./fd_open_file_table_inode.svg?url";
+import TcpHandshakeWithListen from "./tcp_handshake_with_listen.svg?url";
+import ContentLengthByteStream from "./content_length_byte_stream.svg?url";
+
+# Introduction
+
+I have been a backend developer for a while now, but in this age of AI and highly abstracted frameworks,
+I realised I have absolutely no idea how any of it works underneath Express.js and FastAPI.
+This is part of my
+learning journey on understanding how a simple HTTP server works, peeling all the abstraction layers
+and building from the ground up with nothing but Linux man pages and a concerning amount of free time.
+
+> **Note** - The code in this series is written for Linux and POSIX-compliant systems (macOS included).
+> So if you're on Windows, I'm sorry, but maybe consider WSL.
+
+# Network Fundamentals
+
+## What is a Port
+
+Ports are a system-level resource managed by the OS that allows the OS to route packets to the right process.
+Think of it like an apartment building, the IP Address will get you to the building, but the port number will be the room number.
+Note that the range 0 - 1023 is off-limits unless you're root because the kernel reserves them for well-known services like 80 for HTTP and 443 for HTTPS.
+
+<blockquote cite="https://man7.org/linux/man-pages/man7/ip.7.html">
+  <p>The port numbers below 1024 are called privileged ports (or sometimes: reserved ports)</p>
+  <footer>
+    —{" "}
+    <cite>
+      <a href="https://man7.org/linux/man-pages/man7/ip.7.html">man7: ip(7)</a>
+    </cite>
+  </footer>
+</blockquote>
+
+You can actually see this in action:
+
+<Terminal
+  title="bash"
+  code={`
+$ maxchang@MacBookPro http-server % lsof -i :8080
+COMMAND     PID         USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+http-serv 86234 hoetyngchang    3u  IPv4 0x4f53dea081d8aad3      0t0  TCP *:http-alt (LISTEN)
+`}
+></Terminal>
+
+A few things worth noting - `PID` is the process ID, [`FD` is the File Descriptor](#file-descriptors-fd--sockets-are-files), the kernel assigned to your socket.
+`TCP *: http-alt (LISTEN)` shows the socket is bound to all [interfaces](#interfaces) `*` on port 8080. and is listening to connections.
+
+# What is a Socket
+
+A socket is essentially just an abstracted interface that is provided by a Unix-based system for communication between processes, either with
+machines over the network (e.g. loading a webpage, calling an API), or even other processes within the same machine
+(e.g. talking to a local PostgreSQL/redis server).
+
+```cpp
+// Refer to: https://man7.org/linux/man-pages/man2/socket.2.html for more info
+int create_socket() {
+    // AF_INET    — uses IPv4
+    // SOCK_STREAM — reliable, ordered byte stream (TCP)
+
+    int tcp_socket = socket(AF_INET, SOCK_STREAM, 0);
+
+    if (tcp_socket < 0) {
+        err(EXIT_FAILURE, "socket");
+    }
+
+    return tcp_socket;
+}
+```
+
+## File Descriptors (fd) — Sockets Are Files??
+
+Everything in a Unix-based system, anything that is related to files, sockets, or Input/Output(I/O), is treated as a file.
+The kernel represents each one as a `file descriptor (fd)`, which is just an integer that references an entry in the open file table.
+
+Each entry in the open file table is a [`struct file`](https://github.com/torvalds/linux/blob/v6.8/include/linux/fs.h#L994)
+where it determines what each `read()`, `write()` and `close()` actually do for a certain resource.
+`struct file` will then point to an inode. For sockets specifically, it connects through a
+[`struct socket`](https://github.com/torvalds/linux/blob/master/include/linux/net.h#L137) in the kernel.
+
+<ZoomableSvg
+  src={fdOpenFileTableInodeSrc}
+  caption="fd → open file table → inode"
+  alt="Diagram showing how file descriptors map to the kernel open file table and then to inodes"
+/>
+
+Which is why you'll be able to write/close a socket like how you would do it when writing files
+
+```cpp
+// Writing to a file
+int fd = open("output.txt", O_WRONLY | O_CREAT, 0644);
+write(fd, "Hello World!\n", 13);
+close(fd);
+
+// Writing to a socket
+int client_fd = accept(socket, config, &addr_length);
+write(client_fd, response.c_str(), response.size());
+close(client_fd);
+```
+
+# Giving the Socket an Address
+
+## struct sockaddr_in
+
+To setup the socket with an address, we need to first describe the socket's address using
+`sockaddr_in` - the config struct for IPv4 connections [man7](https://man7.org/linux/man-pages/man3/sockaddr.3type.html)
+
+```cpp
+struct sockaddr_in config = {
+  .sin_family = AF_INET,
+  .sin_port = htons(PORT),
+  .sin_addr.s_addr = INADDR_ANY
+};
+```
+
+## Endianness
+
+When passing `sin_port`, I just assumed passing 8080 would work, as it only needs a port number, right?
+
+But after some research, I figured that it was due to different machines interpretation of byte order.
+There is a difference in how bytes are stored in a computer.
+
+- **Big-endian** — most significant byte first (what the network expects)
+- **Little-endian** — least significant byte first (what most modern CPUs use)
+
+So `8080` on your machine is stored as `0x90 0x1F`, but the network expects `0x1F 0x90`,
+leading to the wrong ports being binded.
+
+So by calling `htons`, the bytes will be flipped on little-endian machines, while no-ops on big-endian machines.
+
+## Network Interfaces
+
+A Network interface is how your machines connect to a network. Each of them will have its own IP address.
+You can view yours on `ifconfig`.
+
+<Terminal
+  title="bash"
+  code={`
+$ maxchang@MacBookPro http-server % ifconfig
+lo0: flags=8049<UP,LOOPBACK,RUNNING,MULTICAST> mtu 16384
+	options=1203<RXCSUM,TXCSUM,TXSTATUS,SW_TIMESTAMP>
+	inet 127.0.0.1 netmask 0xff000000
+	inet6 ::1 prefixlen 128 
+	inet6 fe80::1%lo0 prefixlen 64 scopeid 0x1 
+	nd6 options=201<PERFORMNUD,DAD>
+
+en0: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+options=6460<TSO4,TSO6,CHANNEL_IO,PARTIAL_CSUM,ZEROINVERT_CSUM>
+ether 02:78:1e:e3:c0:49
+inet6 fe80::c8d:8672:c88e:8976%en0 prefixlen 64 secured scopeid 0xe
+inet 10.0.0.98 netmask 0xfffffe00 broadcast 10.0.1.255
+nd6 options=201<PERFORMNUD,DAD>
+media: autoselect
+status: active
+`}
+
+> </Terminal>
+
+When binding a socket, you're free to choose which interface to accept connections via `sin_addr.s_addr`
+
+- `INADDR_ANY` means "bind to all available interfaces"
+- `int_addr(x)` allows you to be specific with whatever interfaces you're targeting
+  - e.g. `int_addr(127.0.0.1)` binds to loopback only (local machine only)
+
+> **Note**: the OS binds to an **IP + port** combination, not just a port. So two services can
+> both listen on port 8080 as long as they bind to different IPs. `INADDR_ANY` blocks this
+> since it claims `0.0.0.0:8080`, overlapping every interface.
+> `localhost` resolves to `127.0.0.1`, so `curl localhost:8080` only reaches a server bound
+> to `127.0.0.1` or `INADDR_ANY` — not one bound to `10.0.0.98`.
+
+# Starting the Server
+
+## listen() and accept()
+
+Once the socket is bound, two calls is needed for the server to start receiving requests
+
+```cpp
+void start_listening(int socket) {
+    if (listen(socket, SOMAXCONN) < 0) {
+        err(EXIT_FAILURE, "listen");
+    }
+}
+
+void start_server(int socket, sockaddr *config) {
+    while (1) {
+        socklen_t addr_length = sizeof(*config);
+        int client = accept(socket, config, &addr_length);
+        if (client < 0) {
+            err(EXIT_FAILURE, "accept");
+        }
+        handle_client(client);
+    }
+}
+```
+
+`listen()` doesn't block and accept anything. Its main purpose is marking the socket as passive.
+Incoming connections are being handed off to `accept()`, which returns a new `fd` for each client. The new `fd` is where the data exchange happens.
+
+### The TCP Handshake
+
+`listen()` marks the socket as passive, allowing the kernel to start handling incoming connections for that socket automatically.
+After completing the TCP handshake, the connection will then be placed in a backlog queue.
+
+<ZoomableSvg
+  src={TcpHandshakeWithListen}
+  caption="TCP Handshake"
+  alt="Diagram showing the TCP three-way handshake — listen() marks the socket as passive, followed by SYN, SYN-ACK, and ACK between client and kernel, before accept() hands the connection fd to your code"
+/>
+
+### Backlog Queue
+
+After the TCP handshake is done, it will be in a FIFO accept queue ([`icsk_accept_queue`](https://github.com/torvalds/linux/blob/v6.8/include/net/inet_connection_sock.h#L58)),
+where it will wait for the server to run `accept()`. `listen(socket, SOMAXCONN)` where `SOMAXCONN` represents the constant of the system's
+maximum queue size. The kernel will simply drop new connections when it's full, which causes a timeout.
+
+# Handling a Client
+
+```cpp
+void handle_client(int client_fd) {
+    char buf[4096];
+    int bytes_read = read(client_fd, buf, sizeof(buf) - 1);
+    if (bytes_read > 0) {
+        buf[bytes_read] = '\0';
+        printf("%s\n", buf);
+    }
+
+    std::string body = "Hello World!\n";
+    std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " +
+        std::to_string(body.size()) + "\r\n\r\n" + body;
+
+    write(client_fd, response.c_str(), response.size());
+
+    shutdown(client_fd, SHUT_WR);
+
+    char drain[1024];
+    while (read(client_fd, drain, sizeof(drain)) > 0);
+
+    close(client_fd);
+}
+```
+
+## What an HTTP Response Looks Like
+
+```text
+HTTP/1.1 200 OK\r\n
+Content-Length: 13\r\n
+\r\n
+Hello World!\n
+```
+
+HTTP Response is just a structured string split into three parts, **Status Line**,
+**Headers**, and **Body**.
+
+Before diving into the HTTP response, it is essential to understand what `\r\n` means.
+It stands for **Carriage Return** (`\r`, moves the cursor back to the start of the current line) and
+**Line Feed**(`\n`, moves down to a new line),
+two control characters from the typewriter era.
+Together they form `CRLF`, which HTTP requires as its line ending.
+
+- **Status Line** `HTTP/1.1 200 OK` — the protocol version followed by a status code and reason phrase.
+
+<blockquote cite="https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html">
+  <p>
+    The first line of a Response message is the Status-Line, consisting of the protocol version
+    followed by a numeric status code and its associated textual phrase, with each element separated
+    by SP characters.
+    <br />
+
+    <b>Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF</b>
+
+  </p>
+  <footer>
+    —{" "}
+    <cite>
+      <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html">RFC 2616 §6</a>
+    </cite>
+  </footer>
+</blockquote>
+
+## Why Content-Length Matters
+
+**TCP** itself is just a stream of bytes. So how does the client know when it has received a full response, and not
+just part of it? `Content-Length` tells the client exactly how many bytes to expect, allowing it to stop once it reaches the
+expected number.
+
+<ZoomableSvg
+  src={ContentLengthByteStream}
+  caption="Without Content-Length, the client has no idea when to stop reading"
+  alt="Two side-by-side diagrams comparing a byte stream without Content-Length, where the client hangs, versus one with Content-Length: 13, where the client stops at exactly the right byte"
+/>
+
+## Reading the client's request
+
+`read()` accepts `(client_fd, buffer, size_of_buffer). A **buffer** is just a temporary space in the memory that holds
+data while it's being moved from one place to another.
+
+Note that the code above only reads requests up to 4096 bytes, with the rest
+staying on the kernel's **receive buffer**. This is fine for a simple `GET` request, but a
+`POST` with a large body would need a loop to drain the remaining bytes.
+
+## How the Kernel Writes Back to the Client
+
+When `write()` is called, it copies the bytes into a **send buffer** where the kernel will handle the rest.
+Think of **send buffer** as some sort of postbox, where the kernel is the mailman, which will pick it up and handle the delivery.
+Underneath, the kernel handles the delivery by flushing out the send buffer, where it divides them into TCP chunks, wraps them
+into an IP Packet, and hands them off to the NIC to send over the wire. Beej's Guide describes this encapsulation nicely:
+
+<blockquote cite="https://beej.us/guide/bgnet/html/split/what-is-a-socket.html#lowlevel">
+  <p>
+    A packet is born, the packet is wrapped ("encapsulated") in a header by the first protocol, then
+    the whole thing is encapsulated again by the next protocol (say, UDP), then again by the next
+    (IP), then again by the final protocol on the hardware layer (say, Ethernet).
+  </p>
+  <footer>
+    —{" "}
+    <cite>
+      <a href="https://beej.us/guide/bgnet/html/split/what-is-a-socket.html#lowlevel">
+        Beej's Guide to Network Programming §2.2
+      </a>
+    </cite>
+  </footer>
+</blockquote>
+
+## Closing the Connection
+
+Once the response is sent, we need to close the connection. There are two calls that are needed -
+`shutdown()` and `close()`.
+
+`close()` releases the fd and cuts the connection for both sides.
+
+`shutdown(client_fd, SHUT_WR)` sends a `FIN` to the client, letting the client know we're closing
+the connection while allowing us to drain the remaining bytes before closing the connection. You can actually
+see this in action by listening on the port with `tcpdump`:
+
+<Terminal
+  title="bash"
+  code={`
+$ maxchang@MacBookPro http-server % sudo tcpdump -i lo0 port 8080 -S
+
+# IPv6 attempt — rejected, server only binds AF_INET (IPv4)
+
+IP6 localhost.50523 > localhost.http-alt: Flags [S]
+IP6 localhost.http-alt > localhost.50523: Flags [R.]
+
+# three-way handshake
+
+IP localhost.50524 > localhost.http-alt: Flags [S] # SYN
+IP localhost.http-alt > localhost.50524: Flags [S.] # SYN-ACK
+IP localhost.50524 > localhost.http-alt: Flags [.] # ACK
+IP localhost.http-alt > localhost.50524: Flags [.] # ACK
+
+# data exchange
+
+IP localhost.50524 > localhost.http-alt: Flags [P.] length 77: HTTP: GET / HTTP/1.1
+IP localhost.http-alt > localhost.50524: Flags [.] # ACK
+IP localhost.http-alt > localhost.50524: Flags [P.] length 52: HTTP: HTTP/1.1 200 OK
+
+# four-way teardown
+
+IP localhost.http-alt > localhost.50524: Flags [F.] # server FIN — shutdown(SHUT_WR)
+IP localhost.50524 > localhost.http-alt: Flags [.] # ACK for HTTP data
+IP localhost.50524 > localhost.http-alt: Flags [.] # ACK for FIN
+IP localhost.50524 > localhost.http-alt: Flags [F.] # client FIN
+IP localhost.http-alt > localhost.50524: Flags [.] # ACK
+`}
+
+> </Terminal>
+
+# Testing Your Server
+
+## Full Code
+
+```cpp
+#include <sys/socket.h>
+#include <err.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <limits.h>
+#include <netinet/in.h>
+#include <string>
+#include <signal.h>
+
+
+#define PORT 8080
+
+
+static int server_socket = -1;
+
+void handle_sigint(int sig) {
+    (void)sig;
+    if (server_socket != -1) {
+        printf("\nShutting down server...\n");
+        close(server_socket);
+    }
+    exit(0);
+}
+
+int create_socket() {
+    int tcp_socket = socket(AF_INET, SOCK_STREAM, 0);
+
+    if (tcp_socket < 0) {
+        err(EXIT_FAILURE, "socket");
+    }
+
+    return tcp_socket;
+}
+
+void bind_port(int socket, sockaddr *config) {
+    if (bind(socket, config, sizeof(*config)) < 0) {
+        err(EXIT_FAILURE, "binder");
+    }
+}
+
+void start_listening(int socket) {
+    if (listen(socket, SOMAXCONN) < 0) {
+        err(EXIT_FAILURE, "listen");
+    }
+}
+
+void handle_client(int client_fd) {
+    char buf[4096];
+    int bytes_read = read(client_fd, buf, sizeof(buf) - 1);
+    if (bytes_read > 0) {
+        buf[bytes_read] = '\0';
+        printf("%s\n", buf);
+    }
+
+    std::string body = "Hello World!\n";
+    std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " +
+        std::to_string(body.size()) + "\r\n\r\n" + body;
+
+    write(client_fd, response.c_str(), response.size());
+
+    shutdown(client_fd, SHUT_WR);
+
+    char drain[1024];
+    while (read(client_fd, drain, sizeof(drain)) > 0);
+
+    close(client_fd);
+}
+
+void start_server(int socket, sockaddr *config) {
+    while (1) {
+        socklen_t addr_length = sizeof(*config);
+        int client = accept(socket, config, &addr_length);
+        if (client < 0) {
+            err(EXIT_FAILURE, "accept");
+        }
+        handle_client(client);
+    }
+}
+
+
+int main() {
+    signal(SIGINT, handle_sigint);
+    struct sockaddr_in config = {
+        .sin_family = AF_INET,
+        .sin_port = htons(PORT),
+        .sin_addr.s_addr = INADDR_ANY
+    };
+
+
+    server_socket = create_socket();
+    bind_port(server_socket, (struct sockaddr *)&config);
+    start_listening(server_socket);
+    start_server(server_socket, (struct sockaddr *)&config);
+}
+```
+
+<Terminal
+  title="bash"
+  code={`
+$ maxchang@MacBookPro http-server % curl localhost:8080
+Hello World!
+`}
+></Terminal>

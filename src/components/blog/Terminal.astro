@@ -1,0 +1,45 @@
+---
+interface Props {
+  title?: string;
+  code: string;
+}
+
+const { title = "bash", code } = Astro.props;
+
+type Line =
+  | { type: "input"; content: string }
+  | { type: "output"; content: string }
+  | { type: "blank" };
+
+const lines: Line[] = code.trim().split("\n").map((line) => {
+  if (line.startsWith("$ ")) return { type: "input", content: line.slice(2) };
+  if (line.trim() === "") return { type: "blank" };
+  return { type: "output", content: line };
+});
+---
+
+<div class="term-window">
+  <div class="term-header">
+    <span class="term-dots">● ● ●</span>
+    <span class="term-title">{title}</span>
+  </div>
+  <div class="term-body">
+    {lines.map((line) =>
+      line.type === "input" ? (
+        <div class="term-line">
+          <span class="term-prompt">❯</span>
+          <span class="term-cmd">{line.content}</span>
+        </div>
+      ) : line.type === "blank" ? (
+        <div class="term-line term-blank">&nbsp;</div>
+      ) : (
+        <div class="term-line term-out">{line.content}</div>
+      )
+    )}
+    <div class="term-line">
+      <span class="term-prompt">❯</span>
+      <span class="term-cursor">▋</span>
+    </div>
+  </div>
+  <div class="term-footer">{title}</div>
+</div>
