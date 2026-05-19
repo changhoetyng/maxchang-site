@@ -13,21 +13,30 @@ const { page }: any = Astro.props;
 ---
 
 <BlogSelectionLayout>
-  <div class="w-full h-full flex flex-col items-center justify-center">
-    <div class="w-2/4">
-      <h1 class="text-4xl font-semibold">Posts</h1>
-      <ul class="mt-4">
-        {
-          page.data.map((blogPostEntry: any) => (
-            <PostsSelectionCard slug={blogPostEntry.id}>
-              <slot slot="title">{blogPostEntry.data.title}</slot>
-              <slot slot="date">{blogPostEntry.data.date}</slot>
-              <slot slot="description">{blogPostEntry.data.description}</slot>
-            </PostsSelectionCard>
-          ))
-        }
-      </ul>
-    </div>
+  <div class="blog-index">
+    <header class="blog-index-header">
+      <p class="blog-index-label">writing</p>
+      <h1 class="blog-index-title">Max's Blog</h1>
+      <p class="blog-index-sub">
+        A learning journey through systems, software, and engineering, mostly things I had to figure
+        out the hard way.
+      </p>
+      <div class="blog-index-rule"></div>
+    </header>
+
+    <ul class="blog-post-list">
+      {
+        page.data.map((blogPostEntry: any) => (
+          <PostsSelectionCard
+            slug={blogPostEntry.id}
+            title={blogPostEntry.data.title}
+            date={blogPostEntry.data.date}
+            description={blogPostEntry.data.description}
+          />
+        ))
+      }
+    </ul>
+
     <Pagination
       currentPage={page.currentPage}
       totalPage={page.lastPage}
@@ -36,3 +45,54 @@ const { page }: any = Astro.props;
     />
   </div>
 </BlogSelectionLayout>
+
+<style>
+  .blog-index {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 4rem 1rem 6rem;
+  }
+
+  .blog-index-header {
+    margin-bottom: 3.5rem;
+  }
+
+  .blog-index-label {
+    font-family: "Andale Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #4ec9b0;
+    margin-bottom: 0.6rem;
+  }
+
+  .blog-index-title {
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: #f5ccd4;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 0.75rem;
+  }
+
+  .blog-index-sub {
+    font-size: 15px;
+    color: #505070;
+    line-height: 1.7;
+    margin-bottom: 1.75rem;
+  }
+
+  .blog-index-rule {
+    height: 1px;
+    background: linear-gradient(to right, #e6b450 0%, #bf5fff 45%, transparent 100%);
+    box-shadow:
+      0 0 10px rgba(230, 180, 80, 0.4),
+      0 0 20px rgba(191, 95, 255, 0.15);
+  }
+
+  .blog-post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+</style>
