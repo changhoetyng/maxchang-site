@@ -9,7 +9,7 @@ import Row from "./os/Selectable/Row";
 export default function ProjectList() {
   const [key, setKey] = useState(0);
   function onClickDesktop() {
-    setSelectedFolder(selectedFolder.map((_) => false));
+    setSelectedFolder(selectedFolder.map(() => false));
   }
   function onSelectFolder(idx: number) {
     setSelectedFolder(selectedFolder.map((_, index) => index === idx));
@@ -21,7 +21,7 @@ export default function ProjectList() {
   const iconInPersonalProjects = [
     <Row
       name={"TuneShift"}
-      iconSelections={TEXT_EDIT_ICON.src}
+      iconSelections={TEXT_EDIT_ICON}
       onClick={() => {
         window.open("https://github.com/changhoetyng/tuneshift");
       }}
@@ -30,7 +30,7 @@ export default function ProjectList() {
     />,
     <Row
       name={"Infix Prefix Postfix Converter"}
-      iconSelections={TEXT_EDIT_ICON.src}
+      iconSelections={TEXT_EDIT_ICON}
       onClick={() => {
         window.open("https://github.com/changhoetyng/ippVisualizer");
       }}
@@ -39,7 +39,7 @@ export default function ProjectList() {
     />,
     <Row
       name={"TollCalc"}
-      iconSelections={TEXT_EDIT_ICON.src}
+      iconSelections={TEXT_EDIT_ICON}
       onClick={() => {
         window.open("https://github.com/changhoetyng/tollCalc");
       }}
@@ -51,7 +51,7 @@ export default function ProjectList() {
   const iconInSchoolProjects = [
     <Row
       name={"Face Recognition System Using Siamese Network"}
-      iconSelections={TEXT_EDIT_ICON.src}
+      iconSelections={TEXT_EDIT_ICON}
       onClick={() => {
         window.open(
           "https://drive.google.com/file/d/1sQBiSu0G3logKLPiXGDN1-4br2-1OfnL/view?usp=sharing"
@@ -62,11 +62,9 @@ export default function ProjectList() {
     />,
     <Row
       name={"University Utilities Booking Mobile App"}
-      iconSelections={TEXT_EDIT_ICON.src}
+      iconSelections={TEXT_EDIT_ICON}
       onClick={() => {
-        window.open(
-          "https://github.com/changhoetyng/University-Utilities-Booking-Mobile-App"
-        );
+        window.open("https://github.com/changhoetyng/University-Utilities-Booking-Mobile-App");
       }}
       index={1}
       key={"school-icon-2"}
@@ -75,7 +73,7 @@ export default function ProjectList() {
       name={
         "Reinforcement Learning with Deep Q-Network and Double Deep Q-Network on Low-Dimensional State Space"
       }
-      iconSelections={TEXT_EDIT_ICON.src}
+      iconSelections={TEXT_EDIT_ICON}
       onClick={() => {
         window.open(
           "https://github.com/changhoetyng/Deep-Q-Network-and-Double-Deep-Q-Network-on-Low-Dimensional-State-Space"
@@ -89,7 +87,7 @@ export default function ProjectList() {
   const iconElement = [
     <Icon
       name={"Academic Projects"}
-      iconSelections={FOLDER_ICON.src}
+      iconSelections={FOLDER_ICON}
       onClick={() => onSelectFolder(0)}
       onDoubleClick={() => {
         setSelectedWindow(PROJECTS_SELECTION[0]);
@@ -100,7 +98,7 @@ export default function ProjectList() {
     />,
     <Icon
       name={"Personal Projects"}
-      iconSelections={FOLDER_ICON.src}
+      iconSelections={FOLDER_ICON}
       onClick={() => onSelectFolder(1)}
       onDoubleClick={() => {
         setSelectedWindow(PROJECTS_SELECTION[1]);
