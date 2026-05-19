@@ -3,7 +3,7 @@ const { slug, title, date, description } = Astro.props;
 ---
 
 <li class="post-card">
-  <a class="post-card-link" href={"posts/" + slug}>
+  <a class="post-card-link" href={"/blogs/posts/" + slug}>
     <span class="post-card-date">{date}</span>
     <span class="post-card-title">{title}</span>
     {description && <p class="post-card-desc">{description}</p>}
@@ -23,8 +23,12 @@ const { slug, title, date, description } = Astro.props;
     text-decoration: none;
     transition: opacity 0.15s;
   }
-  .post-card-link:hover { opacity: 0.75; }
-  .post-card-link:hover .post-card-title { color: #f5ccd4; }
+  .post-card-link:hover {
+    opacity: 0.75;
+  }
+  .post-card-link:hover .post-card-title {
+    color: #f5ccd4;
+  }
 
   .post-card-date {
     font-family: "Andale Mono", monospace;
