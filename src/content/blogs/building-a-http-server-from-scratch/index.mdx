@@ -179,7 +179,7 @@ When binding a socket, you're free to choose which interface to accept connectio
 
 ## listen() and accept()
 
-Once the socket is bounded, two calls is needed for the server to start receiving requests
+Once the socket is bound, two calls is needed for the server to start receiving requests
 
 ```cpp
 void start_listening(int socket) {
@@ -200,8 +200,8 @@ void start_server(int socket, sockaddr *config) {
 }
 ```
 
-`listen()` doesn't block and accept anything. It's main purpose is marking the socket as passive.
-Incoming connections is being handed off to `accept()`, which returns a new `fd` for each client. The new `fd` is where the data exchange happens.
+`listen()` doesn't block and accept anything. Its main purpose is marking the socket as passive.
+Incoming connections are being handed off to `accept()`, which returns a new `fd` for each client. The new `fd` is where the data exchange happens.
 
 ### The TCP Handshake
 
@@ -226,8 +226,10 @@ maximum queue size. The kernel will simply drop new connections when it's full, 
 void handle_client(int client_fd) {
     char buf[4096];
     int bytes_read = read(client_fd, buf, sizeof(buf) - 1);
-    buf[bytes_read] = '\0';  // null terminate
-    printf("%s\n", buf);     // print the raw request
+    if (bytes_read > 0) {
+        buf[bytes_read] = '\0';
+        printf("%s\n", buf);
+    }
 
     std::string body = "Hello World!\n";
     std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " +
@@ -235,10 +237,11 @@ void handle_client(int client_fd) {
 
     write(client_fd, response.c_str(), response.size());
 
+    shutdown(client_fd, SHUT_WR);
+
     char drain[1024];
     while (read(client_fd, drain, sizeof(drain)) > 0);
 
-    shutdown(client_fd, SHUT_WR);
     close(client_fd);
 }
 ```
@@ -252,7 +255,7 @@ Content-Length: 13\r\n
 Hello World!\n
 ```
 
-HTTP Response is just a structured string splitted into three parts, **Status Line**,
+HTTP Response is just a structured string split into three parts, **Status Line**,
 **Headers**, and **Body**.
 
 Before diving into the HTTP response, it is essential to understand what `\r\n` means.
@@ -284,7 +287,7 @@ Together they form `CRLF`, which HTTP requires as its line ending.
 ## Why Content-Length Matters
 
 **TCP** itself is just a stream of bytes. So how does the client know when it has received a full response, and not
-just part of it? `Content Length` tells the client exactly how many bytes to expect, allowing it to stop once it reaches the
+just part of it? `Content-Length` tells the client exactly how many bytes to expect, allowing it to stop once it reaches the
 expected number.
 
 <ZoomableSvg
@@ -295,7 +298,7 @@ expected number.
 
 ## Reading the client's request
 
-`read()` accepts `(client_df, buffer, size_of_buffer). A **buffer** is just a temporary space in the memory that holds
+`read()` accepts `(client_fd, buffer, size_of_buffer). A **buffer** is just a temporary space in the memory that holds
 data while it's being moved from one place to another.
 
 Note that the code above only reads requests up to 4096 bytes, with the rest
@@ -305,7 +308,7 @@ staying on the kernel's **receive buffer**. This is fine for a simple `GET` requ
 ## How the Kernel Writes Back to the Client
 
 When `write()` is called, it copies the bytes into a **send buffer** where the kernel will handle the rest.
-Think of **send buffer** as some sort of mailbox, where the kernel is the mailman, which will pick it up and handle the delivery.
+Think of **send buffer** as some sort of postbox, where the kernel is the mailman, which will pick it up and handle the delivery.
 Underneath, the kernel handles the delivery by flushing out the send buffer, where it divides them into TCP chunks, wraps them
 into an IP Packet, and hands them off to the NIC to send over the wire. Beej's Guide describes this encapsulation nicely:
 
